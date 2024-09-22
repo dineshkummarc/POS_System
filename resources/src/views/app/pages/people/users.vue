@@ -32,9 +32,16 @@
           <b-button @click="Users_PDF()" size="sm" variant="outline-success m-1">
             <i class="i-File-Copy"></i> PDF
           </b-button>
-          <b-button @click="Users_Excel()" size="sm" variant="outline-danger m-1">
-            <i class="i-File-Excel"></i> EXCEL
-          </b-button>
+           <vue-excel-xlsx
+              class="btn btn-sm btn-outline-danger ripple m-1"
+              :data="users"
+              :columns="columns"
+              :file-name="'users'"
+              :file-type="'xlsx'"
+              :sheet-name="'users'"
+              >
+              <i class="i-File-Excel"></i> EXCEL
+          </vue-excel-xlsx>
           <b-button
             @click="New_User()"
             size="sm"
@@ -334,7 +341,7 @@
             </b-col>
 
             <b-col md="12" class="mt-3">
-                <b-button variant="primary" type="submit"  :disabled="SubmitProcessing">{{$t('submit')}}</b-button>
+                <b-button variant="primary" type="submit"  :disabled="SubmitProcessing"><i class="i-Yes me-2 font-weight-bold"></i> {{$t('submit')}}</b-button>
                   <div v-once class="typo__p" v-if="SubmitProcessing">
                     <div class="spinner sm spinner-primary mt-3"></div>
                   </div>
@@ -549,7 +556,7 @@ export default {
     //------ Checked Status User
     isChecked(user) {
       axios
-        .put("users/Activated/" + user.id, {
+        .put("users_switch_activated/" + user.id, {
           statut: user.statut,
           id: user.id
         })
@@ -606,33 +613,6 @@ export default {
       pdf.save("User_List.pdf");
     },
 
-    //------------------------ Users Excel ---------------------------\\
-    Users_Excel() {
-      // Start the progress bar.
-      NProgress.start();
-      NProgress.set(0.1);
-      axios
-        .get("users/export/Excel", {
-          responseType: "blob", // important
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
-        .then(response => {
-          const url = window.URL.createObjectURL(new Blob([response.data]));
-          const link = document.createElement("a");
-          link.href = url;
-          link.setAttribute("download", "List_Users.xlsx");
-          document.body.appendChild(link);
-          link.click();
-          // Complete the animation of theprogress bar.
-          setTimeout(() => NProgress.done(), 500);
-        })
-        .catch(() => {
-          // Complete the animation of theprogress bar.
-          setTimeout(() => NProgress.done(), 500);
-        });
-    },
 
     // Simply replaces null values with strings=''
     setToStrings() {

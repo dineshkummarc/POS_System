@@ -226,7 +226,7 @@
 
 
             <b-col md="12" class="mt-3">
-                <b-button variant="primary" type="submit"  :disabled="SubmitProcessing">{{$t('submit')}}</b-button>
+                <b-button variant="primary" type="submit"  :disabled="SubmitProcessing"><i class="i-Yes me-2 font-weight-bold"></i> {{$t('submit')}}</b-button>
                   <div v-once class="typo__p" v-if="SubmitProcessing">
                     <div class="spinner sm spinner-primary mt-3"></div>
                   </div>
@@ -525,7 +525,7 @@ export default {
               //---------------------- Get_departments_by_company ------------------------------\\
             Get_departments_by_company(value) {
             axios
-                .get("/core/Get_departments_by_company?id=" + value)
+                .get("/core/get_departments_by_company?id=" + value)
                 .then(({ data }) => (this.departments = data));
             },
 
@@ -533,7 +533,7 @@ export default {
             
             Get_employees_by_department(value) {
                 axios
-                .get("/Get_employees_by_department?id=" + value)
+                .get("/get_employees_by_department?id=" + value)
                 .then(({ data }) => (this.employees = data));
             },
 

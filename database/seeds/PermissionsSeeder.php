@@ -432,6 +432,82 @@ class PermissionsSeeder extends Seeder
 			'id'    => 105,
 			'name'  => 'stock_report',
 		],
+		[
+			'id'    => 106,
+			'name'  => 'sms_settings',
+		],
+		[
+			'id'    => 107,
+			'name'  => 'pos_settings',
+		],
+		[
+			'id'    => 108,
+			'name'  => 'payment_gateway',
+		],
+		[
+			'id'    => 109,
+			'name'  => 'mail_settings',
+		],
+		[
+			'id'    => 110,
+			'name'  => 'dashboard',
+		],
+		[
+			'id'    => 111,
+			'name'  => 'pay_due',
+		],
+		[
+			'id'    => 112,
+			'name'  => 'pay_sale_return_due',
+		],
+		[
+			'id'    => 113,
+			'name'  => 'pay_supplier_due',
+		],
+		[
+			'id'    => 114,
+			'name'  => 'pay_purchase_return_due',
+		],
+		[
+			'id'    => 115,
+			'name'  => 'product_report',
+		],
+		[
+			'id'    => 116,
+			'name'  => 'product_sales_report',
+		],
+		[
+			'id'    => 117,
+			'name'  => 'product_purchases_report',
+		],
+		[
+			'id'    => 118,
+			'name'  => 'notification_template',
+		],
+		[
+			'id'    => 119,
+			'name'  => 'edit_product_sale',
+		],
+		[
+			'id'    => 120,
+			'name'  => 'edit_product_purchase',
+		],
+		[
+			'id'    => 121,
+			'name'  => 'edit_product_quotation',
+		],
+		[
+			'id'    => 122,
+			'name'  => 'edit_tax_discount_shipping_sale',
+		],
+		[
+			'id'    => 123,
+			'name'  => 'edit_tax_discount_shipping_purchase',
+		],
+		[
+			'id'    => 124,
+			'name'  => 'edit_tax_discount_shipping_quotation',
+		],
 		
 		)
 	);

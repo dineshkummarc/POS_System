@@ -40,30 +40,42 @@
 	float: left;
 } 
 
-.barcode_non_a4 .barcode-name{
+.barcode_non_a4 .head_barcode{
+	padding-left: 10px;
+	font-weight: bold;
+	text-align: left;
+}
+
+.barcodea4 .head_barcode{
+	padding-left: 10px;
+	font-weight: bold;
+	text-align: left;
+}
+
+.barcode-name{
 	display: block;
 }
 
-.barcodea4 .barcode-name{
+.barcode-price{
 	display: block;
 }
 
-.barcodea4 .style24 .barcode-name{
+.barcodea4 .style24 .head_barcode{
 	font-size: 14px;
 }
 
-.barcodea4 .style18 .barcode-name{
+.barcodea4 .style18 .head_barcode{
 	font-size: 14px;
 }
 
-.barcodea4 .style12 .barcode-name{
+.barcodea4 .style12 .head_barcode{
 	font-size: 15px;
 }
 
-.barcode_non_a4 .barcode-name{
+.barcode_non_a4 .head_barcode{
 	font-size: 14px;
 }
-.barcode_non_a4 .style10 .barcode-name{
+.barcode_non_a4 .style10 .head_barcode{
 	font-size: 16px;
 }
 

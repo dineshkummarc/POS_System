@@ -29,12 +29,13 @@
                   <tbody>
                      <tr>
                         <td>
-                           <div><strong>Name:</strong> {{$client['client_name']}}</div>
+                           <div><strong>Full Name:</strong> {{$client['client_name']}}</div>
                            <div><strong>Phone:</strong> {{$client['phone']}}</div>
                            <div><strong>Total Sales:</strong> {{$client['total_sales']}}</div>
                            <div><strong>Total Amount:</strong> {{$symbol}} {{$client['total_amount']}}</div>
                            <div><strong>Total Paid:</strong> {{$symbol}} {{$client['total_paid']}}</div>
-                           <div><strong>Due:</strong> {{$symbol}} {{$client['due']}}</div>
+                           <div><strong>Total Sales Due:</strong> {{$symbol}} {{$client['due']}}</div>
+                           <div><strong>Total Sell Return Due:</strong> {{$symbol}} {{$client['return_Due']}}</div>
                         </td>
                      </tr>
                   </tbody>

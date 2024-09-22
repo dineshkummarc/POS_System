@@ -167,7 +167,7 @@
                 </b-col>
                 <b-col md="12">
                   <b-form-group>
-                    <b-button variant="primary" :disabled="SubmitProcessing" @click="Submit_Adjustment">{{$t('submit')}}</b-button>
+                    <b-button variant="primary" :disabled="SubmitProcessing" @click="Submit_Adjustment"><i class="i-Yes me-2 font-weight-bold"></i> {{$t('submit')}}</b-button>
                     <div v-once class="typo__p" v-if="SubmitProcessing">
                         <div class="spinner sm spinner-primary mt-3"></div>
                       </div>
@@ -240,7 +240,7 @@ export default {
             this.timer = null;
       }
 
-      if (this.search_input.length < 1) {
+      if (this.search_input.length < 2) {
 
         return this.product_filter= [];
       }
@@ -292,7 +292,7 @@ export default {
           this.product.quantity = 1;
         }
         this.product.product_variant_id = result.product_variant_id;
-        this.Get_Product_Details(result.id);
+        this.Get_Product_Details(result.id, result.product_variant_id);
       }
 
       this.search_input= '';
@@ -336,7 +336,7 @@ export default {
         NProgress.start();
         NProgress.set(0.1);
       axios
-        .get("Products/Warehouse/" + id + "?stock=" + 0)
+        .get("get_Products_by_warehouse/" + id + "?stock=" + 0 + "&product_service=" + 0)
          .then(response => {
             this.products = response.data;
              NProgress.done();
@@ -522,8 +522,8 @@ export default {
 
     //---------------------------------Get Product Details ------------------------\\
 
-    Get_Product_Details(product_id) {
-      axios.get("Products/" + product_id).then(response => {
+    Get_Product_Details(product_id, variant_id) {
+      axios.get("/show_product_data/" + product_id +"/"+ variant_id).then(response => {
         this.product.del = 0;
         this.product.id = 0;
         this.product.product_id = response.data.id;

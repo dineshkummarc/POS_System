@@ -107,7 +107,7 @@
             </b-col>
            
             <b-col md="12" class="mt-3">
-              <b-button variant="primary" type="submit"  :disabled="SubmitProcessing">{{$t('submit')}}</b-button>
+              <b-button variant="primary" type="submit"  :disabled="SubmitProcessing"><i class="i-Yes me-2 font-weight-bold"></i> {{$t('submit')}}</b-button>
                 <div v-once class="typo__p" v-if="SubmitProcessing">
                   <div class="spinner sm spinner-primary mt-3"></div>
                 </div>
@@ -296,7 +296,7 @@ export default {
       NProgress.set(0.1);
       axios
         .get(
-          "expensescategory?page=" +
+          "expenses_category?page=" +
             page +
             "&SortField=" +
             this.serverParams.sort.field +
@@ -327,7 +327,7 @@ export default {
     Create_Category() {
       this.SubmitProcessing = true;
       axios
-        .post("expensescategory", {
+        .post("expenses_category", {
           name: this.category.name,
           description: this.category.description
         })
@@ -351,7 +351,7 @@ export default {
     Update_Category() {
       this.SubmitProcessing = true;
       axios
-        .put("expensescategory/" + this.category.id, {
+        .put("expenses_category/" + this.category.id, {
           name: this.category.name,
           description: this.category.description
         })
@@ -385,7 +385,7 @@ export default {
       }).then(result => {
         if (result.value) {
           axios
-            .delete("expensescategory/" + id)
+            .delete("expenses_category/" + id)
             .then(() => {
               this.$swal(
                 this.$t("Delete.Deleted"),
@@ -424,7 +424,7 @@ export default {
           NProgress.start();
           NProgress.set(0.1);
           axios
-            .post("expensescategory/delete/by_selection", {
+            .post("expenses_category_delete_by_selection", {
               selectedIds: this.selectedIds
             })
             .then(() => {

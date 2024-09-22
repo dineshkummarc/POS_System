@@ -40,9 +40,16 @@
           <b-button @click="Purchase_PDF()" size="sm" variant="outline-success ripple m-1">
             <i class="i-File-Copy"></i> PDF
           </b-button>
-          <b-button @click="Purchase_Excel()" size="sm" variant="outline-danger ripple m-1">
-            <i class="i-File-Excel"></i> EXCEL
-          </b-button>
+          <vue-excel-xlsx
+              class="btn btn-sm btn-outline-danger ripple m-1"
+              :data="purchases"
+              :columns="columns"
+              :file-name="'purchases'"
+              :file-type="'xlsx'"
+              :sheet-name="'purchases'"
+              >
+              <i class="i-File-Excel"></i> EXCEL
+          </vue-excel-xlsx>
           <router-link
             class="btn-sm btn btn-primary ripple btn-icon m-1"
             v-if="currentUserPermissions && currentUserPermissions.includes('Purchases_add')"
@@ -71,20 +78,36 @@
                   <span class="_dot _r_block-dot bg-dark"></span>
                   <span class="_dot _r_block-dot bg-dark"></span>
                 </template>
-                <b-navbar-nav>
                   <b-dropdown-item title="Show" :to="'/app/purchases/detail/'+props.row.id">
                     <i class="nav-icon i-Eye font-weight-bold mr-2"></i>
                     {{$t('PurchaseDetail')}}
                   </b-dropdown-item>
-                </b-navbar-nav>
 
                 <b-dropdown-item
                   title="Edit"
-                  v-if="currentUserPermissions.includes('Purchases_edit')"
+                  v-if="currentUserPermissions.includes('Purchases_edit') && props.row.purchase_has_return == 'no'"
                   :to="'/app/purchases/edit/'+props.row.id"
                 >
                   <i class="nav-icon i-Pen-2 font-weight-bold mr-2"></i>
                   {{$t('EditPurchase')}}
+                </b-dropdown-item>
+
+                 <b-dropdown-item
+                  title="Purchase Return"
+                  v-if="currentUserPermissions.includes('Purchase_Returns_add') && props.row.purchase_has_return == 'no'"
+                  :to="'/app/purchases/purchase_return/'+props.row.id"
+                >
+                  <i class="nav-icon i-Back font-weight-bold mr-2"></i>
+                  {{$t('Purchase_Return')}}
+                </b-dropdown-item>
+
+                <b-dropdown-item
+                  title="Purchase Return"
+                  v-if="currentUserPermissions.includes('Purchase_Returns_add') && props.row.purchase_has_return == 'yes'"
+                  :to="'/app/purchase_return/edit/'+props.row.purchasereturn_id+'/'+props.row.id"
+                >
+                  <i class="nav-icon i-Back font-weight-bold mr-2"></i>
+                  {{$t('Purchase_Return')}}
                 </b-dropdown-item>
 
                 <b-dropdown-item
@@ -108,15 +131,20 @@
                   {{$t('DownloadPdf')}}
                 </b-dropdown-item>
 
-                <b-dropdown-item title="Email" @click="Purchase_Email(props.row , props.row.id)">
+                <b-dropdown-item title="Email" @click="Send_Email(props.row.id)">
                   <i class="nav-icon i-Envelope-2 font-weight-bold mr-2"></i>
-                  {{$t('EmailPurchase')}}
+                  {{$t('email_notification')}}
+                </b-dropdown-item>
+
+                <b-dropdown-item title="SMS" @click="Purchase_SMS(props.row.id)">
+                  <i class="nav-icon i-Speach-Bubble font-weight-bold mr-2"></i>
+                  {{$t('sms_notification')}}
                 </b-dropdown-item>
 
                 <b-dropdown-item
                   title="Delete"
                   v-if="currentUserPermissions.includes('Purchases_delete')"
-                  @click="Remove_Purchase(props.row.id)"
+                  @click="Remove_Purchase(props.row.id , props.row.purchase_has_return)"
                 >
                   <i class="nav-icon i-Close-Window font-weight-bold mr-2"></i>
                   {{$t('DeletePurchase')}}
@@ -152,7 +180,8 @@
                 :to="'/app/purchases/detail/'+props.row.id"
               >
                 <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>
-              </router-link>
+              </router-link> <br>
+              <small v-if="props.row.purchase_has_return == 'yes'"><i class="text-15 text-danger i-Back"></i></small>
             </div>
         </template>
       </vue-good-table>
@@ -299,14 +328,14 @@
                       <span
                         title="Email"
                         class="btn btn-icon btn-primary btn-sm"
-                        @click="EmailPayment(facture , purchase)"
+                        @click="Send_Email_Payment(facture.id)"
                       >
                         <i class="i-Envelope"></i>
                       </span>
                       <span
                         title="SMS"
                         class="btn btn-icon btn-secondary btn-sm"
-                        @click="Payment_Purchase_SMS(facture)"
+                        @click="Payment_Purchase_SMS(facture.id)"
                       >
                         <i class="i-Speach-Bubble"></i>
                       </span>
@@ -339,7 +368,7 @@
         <b-form @submit.prevent="Submit_Payment">
           <b-row>
             <!-- date -->
-            <b-col lg="6" md="12" sm="12">
+            <b-col lg="4" md="12" sm="12">
               <validation-provider
                 name="date"
                 :rules="{ required: true}"
@@ -359,7 +388,7 @@
             </b-col>
 
             <!-- Reference  -->
-            <b-col lg="6" md="12" sm="12">
+            <b-col lg="4" md="12" sm="12">
               <b-form-group :label="$t('Reference')">
                 <b-form-input
                   disabled="disabled"
@@ -370,8 +399,35 @@
               </b-form-group>
             </b-col>
 
+             <!-- Payment choice -->
+            <b-col lg="4" md="12" sm="12">
+              <validation-provider name="Payment choice" :rules="{ required: true}">
+                <b-form-group slot-scope="{ valid, errors }" :label="$t('Paymentchoice')">
+                  <v-select
+                    :class="{'is-invalid': !!errors.length}"
+                    :state="errors[0] ? false : (valid ? true : null)"
+                    v-model="facture.Reglement"
+                    @input="Selected_PaymentMethod"
+                    :reduce="label => label.value"
+                    :placeholder="$t('PleaseSelect')"
+                    :options="
+                          [
+                          {label: 'Cash', value: 'Cash'},
+                          {label: 'credit card', value: 'credit card'},
+                           {label: 'TPE', value: 'tpe'},
+                          {label: 'cheque', value: 'cheque'},
+                          {label: 'Western Union', value: 'Western Union'},
+                          {label: 'bank transfer', value: 'bank transfer'},
+                          {label: 'other', value: 'other'},
+                          ]"
+                  ></v-select>
+                  <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
+                </b-form-group>
+              </validation-provider>
+            </b-col>
+
              <!-- Received  Amount  -->
-            <b-col lg="6" md="12" sm="12">
+            <b-col lg="4" md="12" sm="12">
               <validation-provider
                 name="Received Amount"
                 :rules="{ required: true , regex: /^\d*\.?\d*$/}"
@@ -394,7 +450,7 @@
           </b-col>
 
             <!-- Paying Amount  -->
-            <b-col lg="6" md="12" sm="12">
+            <b-col lg="4" md="12" sm="12">
               <validation-provider
                 name="Amount"
                 :rules="{ required: true , regex: /^\d*\.?\d*$/}"
@@ -415,39 +471,13 @@
             </b-col>
 
             <!-- change Amount  -->
-            <b-col lg="6" md="12" sm="12">
+            <b-col lg="4" md="12" sm="12">
               <label>{{$t('Change')}} :</label>
               <p
                 class="change_amount"
               >{{parseFloat(facture.received_amount - facture.montant).toFixed(2)}}</p>
             </b-col>
-
-            <!-- Payment choice -->
-            <b-col lg="6" md="12" sm="12">
-              <validation-provider name="Payment choice" :rules="{ required: true}">
-                <b-form-group slot-scope="{ valid, errors }" :label="$t('Paymentchoice')">
-                  <v-select
-                    :class="{'is-invalid': !!errors.length}"
-                    :state="errors[0] ? false : (valid ? true : null)"
-                    v-model="facture.Reglement"
-                    @input="Selected_PaymentMethod"
-                    :reduce="label => label.value"
-                    :placeholder="$t('PleaseSelect')"
-                    :options="
-                          [
-                          {label: 'Cash', value: 'Cash'},
-                          {label: 'credit card', value: 'credit card'},
-                          {label: 'cheque', value: 'cheque'},
-                          {label: 'Western Union', value: 'Western Union'},
-                          {label: 'bank transfer', value: 'bank transfer'},
-                          {label: 'other', value: 'other'},
-                          ]"
-                  ></v-select>
-                  <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
-                </b-form-group>
-              </validation-provider>
-            </b-col>
-
+           
             <!-- Note -->
             <b-col lg="12" md="12" sm="12" class="mt-3">
               <b-form-group :label="$t('Note')">
@@ -459,7 +489,7 @@
                 variant="primary"
                 type="submit"
                 :disabled="paymentProcessing"
-              >{{$t('submit')}}</b-button>
+              ><i class="i-Yes me-2 font-weight-bold"></i> {{$t('submit')}}</b-button>
               <div v-once class="typo__p" v-if="paymentProcessing">
                 <div class="spinner sm spinner-primary mt-3"></div>
               </div>
@@ -762,7 +792,8 @@ export default {
       this.Filter_Payment = "";
       this.Filter_Ref = "";
       this.Filter_date = "";
-      (this.Filter_warehouse = ""), this.Get_Purchases(this.serverParams.page);
+      this.Filter_warehouse = "";
+      this.Get_Purchases(this.serverParams.page);
     },
 
     //---------------------- Purchases PDF -------------------------------\\
@@ -785,34 +816,6 @@ export default {
       pdf.save("Purchase_List.pdf");
     },
 
-    //----------------------- Purchases Excel -------------------------------\\
-    Purchase_Excel() {
-      // Start the progress bar.
-      NProgress.start();
-      NProgress.set(0.1);
-      axios
-        .get("purchases/export/Excel", {
-          responseType: "blob", // important
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
-        .then(response => {
-          const url = window.URL.createObjectURL(new Blob([response.data]));
-          const link = document.createElement("a");
-          link.href = url;
-          link.setAttribute("download", "List_Purchases.xlsx");
-          document.body.appendChild(link);
-          link.click();
-          // Complete the animation of the  progress bar.
-          setTimeout(() => NProgress.done(), 500);
-        })
-        .catch(() => {
-          // Complete the animation of the  progress bar.
-          setTimeout(() => NProgress.done(), 500);
-        });
-    },
-
     //--------------------------- Invoice Purchase -------------------------------\\
     Invoice_PDF(purchase, id) {
       // Start the progress bar.
@@ -820,7 +823,7 @@ export default {
       NProgress.set(0.1);
      
        axios
-        .get("Purchase_PDF/" + id, {
+        .get("purchase_pdf/" + id, {
           responseType: "blob", // important
           headers: {
             "Content-Type": "application/json"
@@ -849,7 +852,7 @@ export default {
       NProgress.set(0.1);
      
        axios
-        .get("Payment_Purchase_PDF/" + id, {
+        .get("payment_purchase_pdf/" + id, {
           responseType: "blob", // important
           headers: {
             "Content-Type": "application/json"
@@ -949,42 +952,46 @@ export default {
 
     //------------------------------- Remove Purchase -------------------------\\
 
-    Remove_Purchase(id) {
-      this.$swal({
-        title: this.$t("Delete.Title"),
-        text: this.$t("Delete.Text"),
-        type: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        cancelButtonText: this.$t("Delete.cancelButtonText"),
-        confirmButtonText: this.$t("Delete.confirmButtonText")
-      }).then(result => {
-        if (result.value) {
-          // Start the progress bar.
-          NProgress.start();
-          NProgress.set(0.1);
-          axios
-            .delete("purchases/" + id)
-            .then(() => {
-              this.$swal(
-                this.$t("Delete.Deleted"),
-                this.$t("Delete.PurchaseDeleted"),
-                "success"
-              );
-              Fire.$emit("Delete_Purchase");
-            })
-            .catch(() => {
-              // Complete the animation of the  progress bar.
-              setTimeout(() => NProgress.done(), 500);
-              this.$swal(
-                this.$t("Delete.Failed"),
-                this.$t("Delete.Therewassomethingwronge"),
-                "warning"
-              );
-            });
-        }
-      });
+    Remove_Purchase(id , purchase_has_return) {
+      if(purchase_has_return == 'yes'){
+        this.makeToast("danger", this.$t("Return_exist_for_the_Transaction"), this.$t("Failed"));
+      }else{
+        this.$swal({
+          title: this.$t("Delete.Title"),
+          text: this.$t("Delete.Text"),
+          type: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          cancelButtonText: this.$t("Delete.cancelButtonText"),
+          confirmButtonText: this.$t("Delete.confirmButtonText")
+        }).then(result => {
+          if (result.value) {
+            // Start the progress bar.
+            NProgress.start();
+            NProgress.set(0.1);
+            axios
+              .delete("purchases/" + id)
+              .then(() => {
+                this.$swal(
+                  this.$t("Delete.Deleted"),
+                  this.$t("Delete.PurchaseDeleted"),
+                  "success"
+                );
+                Fire.$emit("Delete_Purchase");
+              })
+              .catch(() => {
+                // Complete the animation of the  progress bar.
+                setTimeout(() => NProgress.done(), 500);
+                this.$swal(
+                  this.$t("Delete.Failed"),
+                  this.$t("Delete.Therewassomethingwronge"),
+                  "warning"
+                );
+              });
+          }
+        });
+      }
     },
 
     //---- Delete purchases by selection
@@ -1005,7 +1012,7 @@ export default {
           NProgress.start();
           NProgress.set(0.1);
           axios
-            .post("purchases/delete/by_selection", {
+            .post("purchases_delete_by_selection", {
               selectedIds: this.selectedIds
             })
             .then(() => {
@@ -1031,13 +1038,13 @@ export default {
     },
 
       //---------SMS notification
-     Payment_Purchase_SMS(facture) {
+     Payment_Purchase_SMS(id) {
       // Start the progress bar.
       NProgress.start();
       NProgress.set(0.1);
       axios
-        .post("payment/purchase/send/sms", {
-          id: facture.id,
+        .post("payment_purchase_send_sms", {
+          id: id,
         })
         .then(response => {
           // Complete the animation of the  progress bar.
@@ -1055,26 +1062,14 @@ export default {
         });
     },
 
-    //--------------------------------------------- Send Purchase to Email -------------------------------\\
 
-    EmailPayment(facture, purchase) {
-      this.emailPayment.id = facture.id;
-      this.emailPayment.to = purchase.provider_email;
-      this.emailPayment.Ref = facture.Ref;
-      this.emailPayment.supplier_name = purchase.provider_name;
-      this.Send_Email_Payment();
-    },
-
-    Send_Email_Payment() {
+    Send_Email_Payment(id) {
       // Start the progress bar.
       NProgress.start();
       NProgress.set(0.1);
       axios
-        .post("payment/purchase/send/email", {
-          id: this.emailPayment.id,
-          to: this.emailPayment.to,
-          supplier_name: this.emailPayment.supplier_name,
-          Ref: this.emailPayment.Ref
+        .post("payment_purchase_send_email", {
+          id: id,
         })
         .then(response => {
           // Complete the animation of the  progress bar.
@@ -1093,25 +1088,14 @@ export default {
         });
     },
 
-    //---------------------------------------------------- Purchase Email -------------------------------\\
-    Purchase_Email(purchase) {
-      this.email.to = purchase.provider_email;
-      this.email.purchase_Ref = purchase.Ref;
-      this.email.supplier_name = purchase.provider_name;
-      this.Send_Email(purchase.id);
-    },
-
     //--------------------------------------------- Send Purchase to Email -------------------------------\\
     Send_Email(id) {
       // Start the progress bar.
       NProgress.start();
       NProgress.set(0.1);
       axios
-        .post("purchases/send/email", {
+        .post("purchase_send_email", {
           id: id,
-          to: this.email.to,
-          supplier_name: this.email.supplier_name,
-          Ref: this.email.purchase_Ref
         })
         .then(response => {
           // Complete the animation of the  progress bar.
@@ -1126,6 +1110,32 @@ export default {
           // Complete the animation of the  progress bar.
           setTimeout(() => NProgress.done(), 500);
           this.makeToast("danger", this.$t("SMTPIncorrect"), this.$t("Failed"));
+        });
+    },
+
+     //---------SMS notification
+     
+     Purchase_SMS(id) {
+      // Start the progress bar.
+      NProgress.start();
+      NProgress.set(0.1);
+      axios
+        .post("purchase_send_sms", {
+          id: id,
+        })
+        .then(response => {
+          // Complete the animation of the  progress bar.
+          setTimeout(() => NProgress.done(), 500);
+          this.makeToast(
+            "success",
+            this.$t("Send_SMS"),
+            this.$t("Success")
+          );
+        })
+        .catch(error => {
+          // Complete the animation of the  progress bar.
+          setTimeout(() => NProgress.done(), 500);
+          this.makeToast("danger", this.$t("sms_config_invalid"), this.$t("Failed"));
         });
     },
 
@@ -1160,7 +1170,7 @@ export default {
 
     Number_Order_Payment() {
       axios
-        .get("payment/purchase/Number/Order")
+        .get("payment_purchase_get_number")
         .then(({ data }) => (this.facture.Ref = data));
     },
 
@@ -1218,7 +1228,7 @@ export default {
       NProgress.start();
       NProgress.set(0.1);
         axios
-          .post("payment/purchase", {
+          .post("payment_purchase", {
             purchase_id: this.purchase.id,
             date: this.facture.date,
             montant: parseFloat(this.facture.montant).toFixed(2),
@@ -1249,7 +1259,7 @@ export default {
       NProgress.set(0.1);
      
         axios
-          .put("payment/purchase/" + this.facture.id, {
+          .put("payment_purchase/" + this.facture.id, {
             purchase_id: this.purchase.id,
             date: this.facture.date,
             montant: parseFloat(this.facture.montant).toFixed(2),
@@ -1292,7 +1302,7 @@ export default {
           NProgress.start();
           NProgress.set(0.1);
           axios
-            .delete("payment/purchase/" + id)
+            .delete("payment_purchase/" + id)
             .then(() => {
               this.$swal(
                 this.$t("Delete.Deleted"),
@@ -1317,7 +1327,7 @@ export default {
     //----------------------------------------- Get All Payments  -------------------------------\\
     Get_Payments(id) {
       axios
-        .get("purchases/Payments/" + id)
+        .get("get_payments_by_purchase/" + id)
         .then(response => {
           this.factures = response.data.payments;
           this.purchase_due = response.data.due;
@@ -1343,7 +1353,7 @@ export default {
         this.Get_Purchases(this.serverParams.page);
         // Complete the animation of the  progress bar.
         NProgress.done();
-      }, 500);
+      }, 800);
     });
 
     Fire.$on("Create_Facture_purchase", () => {
@@ -1352,26 +1362,25 @@ export default {
         // Complete the animation of the  progress bar.
         NProgress.done();
         this.$bvModal.hide("Add_Payment");
-      }, 500);
+      }, 800);
     });
 
     Fire.$on("Update_Facture_purchase", () => {
+      
       setTimeout(() => {
-        this.Get_Payments(this.Purchase_id);
-        this.Get_Purchases(this.serverParams.page);
-        // Complete the animation of the  progress bar.
         NProgress.done();
         this.$bvModal.hide("Add_Payment");
-      }, 500);
+        this.$bvModal.hide("Show_payment");
+        this.Get_Purchases(this.serverParams.page);
+      }, 800);
     });
 
     Fire.$on("Delete_Facture_purchase", () => {
       setTimeout(() => {
-        this.Get_Payments(this.Purchase_id);
-        this.Get_Purchases(this.serverParams.page);
-        // Complete the animation of the  progress bar.
         NProgress.done();
-      }, 500);
+        this.$bvModal.hide("Show_payment");
+        this.Get_Purchases(this.serverParams.page);
+      }, 800);
     });
   }
 };

@@ -113,13 +113,11 @@
                             <span>{{detail.code}}</span>
                             <br>
                             <span class="badge badge-success">{{detail.name}}</span>
-                            <i @click="Modal_Updat_Detail(detail)" class="i-Edit"></i>
                           </td>
                           <td>{{currentUser.currency}} {{formatNumber(detail.Net_price, 3)}}</td>
                           <td>
-                            <span
-                              class="badge badge-outline-warning"
-                            >{{detail.stock}} {{detail.unitSale}}</span>
+                            <span class="badge badge-warning" v-if="detail.product_type == 'is_service'">----</span>
+                            <span class="badge badge-warning" v-else>{{detail.stock}} {{detail.unitSale}}</span>
                           </td>
                           <td>
                             <div class="quantity">
@@ -149,14 +147,10 @@
                           <td>{{currentUser.currency}} {{formatNumber(detail.DiscountNet * detail.quantity, 2)}}</td>
                           <td>{{currentUser.currency}} {{formatNumber(detail.taxe * detail.quantity, 2)}}</td>
                           <td>{{currentUser.currency}} {{detail.subtotal.toFixed(2)}}</td>
-                          <td>
-                            <a
-                              @click="delete_Product_Detail(detail.detail_id)"
-                              class="btn btn-icon btn-sm"
-                              title="Delete"
-                            >
-                              <i class="i-Close-Window text-25 text-danger"></i>
-                            </a>
+                           <td>
+                            <i v-if="currentUserPermissions && currentUserPermissions.includes('edit_product_quotation')"
+                             @click="Modal_Updat_Detail(detail)" class="i-Edit text-25 text-success cursor-pointer"></i>
+                            <i @click="delete_Product_Detail(detail.detail_id)" class="i-Close-Window text-25 text-danger cursor-pointer"></i>
                           </td>
                         </tr>
                       </tbody>
@@ -196,7 +190,7 @@
                 </div>
 
                 <!-- Order Tax  -->
-                <b-col lg="4" md="4" sm="12" class="mb-3">
+                <b-col lg="4" md="4" sm="12" class="mb-3" v-if="currentUserPermissions && currentUserPermissions.includes('edit_tax_discount_shipping_quotation')">
                   <validation-provider
                     name="Order Tax"
                     :rules="{ regex: /^\d*\.?\d*$/}"
@@ -220,7 +214,7 @@
                 </b-col>
 
                 <!-- Discount -->
-                <b-col lg="4" md="4" sm="12" class="mb-3">
+                <b-col lg="4" md="4" sm="12" class="mb-3" v-if="currentUserPermissions && currentUserPermissions.includes('edit_tax_discount_shipping_quotation')">
                   <validation-provider
                     name="Discount"
                     :rules="{ regex: /^\d*\.?\d*$/}"
@@ -244,7 +238,7 @@
                 </b-col>
 
                 <!-- Shipping  -->
-                <b-col lg="4" md="4" sm="12" class="mb-3">
+                <b-col lg="4" md="4" sm="12" class="mb-3" v-if="currentUserPermissions && currentUserPermissions.includes('edit_tax_discount_shipping_quotation')">
                   <validation-provider
                     name="Shipping"
                     :rules="{ regex: /^\d*\.?\d*$/}"
@@ -300,7 +294,7 @@
                 </b-col>
                 <b-col md="12">
                   <b-form-group>
-                    <b-button variant="primary" @click="Submit_Quotation" :disabled="SubmitProcessing">{{$t('submit')}}</b-button>
+                    <b-button variant="primary" @click="Submit_Quotation" :disabled="SubmitProcessing"><i class="i-Yes me-2 font-weight-bold"></i> {{$t('submit')}}</b-button>
                     <div v-once class="typo__p" v-if="SubmitProcessing">
                       <div class="spinner sm spinner-primary mt-3"></div>
                     </div>
@@ -420,7 +414,7 @@
             </b-col>
 
              <!-- Unit Sale -->
-             <b-col lg="6" md="6" sm="12">
+             <b-col lg="6" md="6" sm="12" v-if="detail.product_type != 'is_service'">
               <validation-provider name="Unit Sale" :rules="{ required: true}">
                 <b-form-group slot-scope="{ valid, errors }" :label="$t('UnitSale') + ' ' + '*'">
                   <v-select
@@ -450,7 +444,7 @@
 
             <b-col md="12">
               <b-form-group>
-                <b-button variant="primary" type="submit" :disabled="Submit_Processing_detail">{{$t('submit')}}</b-button>
+                <b-button variant="primary" type="submit" :disabled="Submit_Processing_detail"><i class="i-Yes me-2 font-weight-bold"></i> {{$t('submit')}}</b-button>
                 <div v-once class="typo__p" v-if="Submit_Processing_detail">
                   <div class="spinner sm spinner-primary mt-3"></div>
                 </div>
@@ -487,6 +481,7 @@ export default {
       details: [],
       detail: {},
       quotations: [],
+      quotation_with_stock:'',
       quote: {
         id: "",
         statut: "pending",
@@ -504,6 +499,7 @@ export default {
       product: {
         id: "",
         code: "",
+        product_type: "",
         stock: "",
         quantity: 1,
         discount: "",
@@ -531,7 +527,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["currentUser"])
+    ...mapGetters(["currentUserPermissions","currentUser"])
   },
 
   methods: {
@@ -583,10 +579,10 @@ export default {
       });
     },
 
-    //---------------------- Get_sales_units ------------------------------\\
-    Get_sales_units(value) {
+    //---------------------- get_units ------------------------------\\
+    get_units(value) {
       axios
-        .get("Get_sales_units?id=" + value)
+        .get("get_units?id=" + value)
         .then(({ data }) => (this.units = data));
     },
 
@@ -595,10 +591,11 @@ export default {
       NProgress.start();
       NProgress.set(0.1);
       this.detail = {};
-      this.Get_sales_units(detail.product_id);
+      this.get_units(detail.product_id);
       this.detail.detail_id = detail.detail_id;
       this.detail.sale_unit_id = detail.sale_unit_id;
       this.detail.name = detail.name;
+      this.detail.product_type = detail.product_type;
       this.detail.Unit_price = detail.Unit_price;
       this.detail.fix_price = detail.fix_price;
       this.detail.fix_stock = detail.fix_stock;
@@ -657,6 +654,7 @@ export default {
           this.details[i].discount = this.detail.discount;
           this.details[i].sale_unit_id = this.detail.sale_unit_id;
           this.details[i].imei_number = this.detail.imei_number;
+          this.details[i].product_type = this.detail.product_type;
 
           if (this.details[i].discount_Method == "2") {
             //Fixed
@@ -715,7 +713,7 @@ export default {
             this.timer = null;
       }
 
-      if (this.search_input.length < 1) {
+      if (this.search_input.length < 2) {
 
         return this.product_filter= [];
       }
@@ -760,16 +758,21 @@ export default {
       ) {
         this.makeToast("warning", this.$t("AlreadyAdd"), this.$t("Warning"));
       } else {
-        this.product.code = result.code;
-        this.product.stock = result.qte_sale;
-        this.product.fix_stock = result.qte;
-        if (result.qte_sale < 1) {
-          this.product.quantity = result.qte_sale;
-        } else {
-          this.product.quantity = 1;
-        }
+          if( result.product_type =='is_service'){
+            this.product.quantity = 1;
+            this.product.code = result.code;
+          }else{
+            this.product.code = result.code;
+            this.product.stock = result.qte_sale;
+            this.product.fix_stock = result.qte;
+            if (result.qte_sale < 1) {
+              this.product.quantity = result.qte_sale;
+            } else {
+              this.product.quantity = 1;
+            }
+          }
         this.product.product_variant_id = result.product_variant_id;
-        this.Get_Product_Details(result.id);
+        this.Get_Product_Details(result.id, result.product_variant_id);
       }
 
       this.search_input= '';
@@ -791,7 +794,7 @@ export default {
         NProgress.start();
         NProgress.set(0.1);
       axios
-        .get("Products/Warehouse/" + id + "?stock=" + 1)
+        .get("get_Products_by_warehouse/" + id + "?stock=" + this.quotation_with_stock + "&product_service=" + 1)
          .then(response => {
             this.products = response.data;
              NProgress.done();
@@ -823,7 +826,7 @@ export default {
             this.details[i].quantity = detail.stock;
           }
 
-          if (detail.quantity > detail.stock) {
+          if (this.quotation_with_stock && (detail.quantity > detail.stock)) {
             this.makeToast("warning", this.$t("LowStock"), this.$t("Warning"));
             this.details[i].quantity = detail.stock;
           } else {
@@ -840,7 +843,7 @@ export default {
     increment(detail, id) {
       for (var i = 0; i < this.details.length; i++) {
         if (this.details[i].detail_id == id) {
-          if (detail.quantity + 1 > detail.stock) {
+          if (this.quotation_with_stock && (detail.quantity + 1 > detail.stock)) {
             this.makeToast("warning", this.$t("LowStock"), this.$t("Warning"));
           } else {
             this.formatNumber(this.details[i].quantity++, 2);
@@ -857,7 +860,7 @@ export default {
       for (var i = 0; i < this.details.length; i++) {
         if (this.details[i].detail_id == id) {
           if (detail.quantity - 1 > 0) {
-            if (detail.quantity - 1 > detail.stock) {
+            if (this.quotation_with_stock && (detail.quantity - 1 > detail.stock)) {
               this.makeToast(
                 "warning",
                 this.$t("LowStock"),
@@ -1040,12 +1043,13 @@ export default {
 
     //---------------------------------Get Product Details ------------------------\\
 
-    Get_Product_Details(product_id) {
-      axios.get("Products/" + product_id).then(response => {
+    Get_Product_Details(product_id, variant_id) {
+      axios.get("/show_product_data/" + product_id +"/"+ variant_id).then(response => {
         this.product.discount = 0;
         this.product.DiscountNet = 0;
         this.product.discount_Method = "2";
         this.product.product_id = response.data.id;
+        this.product.product_type = response.data.product_type;
         this.product.name = response.data.name;
         this.product.Net_price = response.data.Net_price;
         this.product.Unit_price = response.data.Unit_price;
@@ -1069,6 +1073,7 @@ export default {
         .then(response => {
           this.clients = response.data.clients;
           this.warehouses = response.data.warehouses;
+          this.quotation_with_stock = response.data.quotation_with_stock;
           this.isLoading = false;
         })
         .catch(response => {

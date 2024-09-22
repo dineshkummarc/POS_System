@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\UsersExport;
 use App\Models\Role;
 use App\Models\Setting;
 use App\Models\User;
@@ -18,7 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Intervention\Image\ImageManagerStatic as Image;
-use Maatwebsite\Excel\Facades\Excel;
+use \Nwidart\Modules\Facades\Module;
 
 class UserController extends BaseController
 {
@@ -151,6 +150,12 @@ class UserController extends BaseController
                 $filename = 'no_avatar.png';
             }
 
+            if($request['is_all_warehouses'] == '1' || $request['is_all_warehouses'] == 'true'){
+                $is_all_warehouses = 1;
+            }else{
+                $is_all_warehouses = 0;
+            }
+
             $User = new User;
             $User->firstname = $request['firstname'];
             $User->lastname  = $request['lastname'];
@@ -160,7 +165,7 @@ class UserController extends BaseController
             $User->password  = Hash::make($request['password']);
             $User->avatar    = $filename;
             $User->role_id   = $request['role'];
-            $User->is_all_warehouses   = $request['is_all_warehouses'];
+            $User->is_all_warehouses   = $is_all_warehouses;
             $User->save();
 
             $role_user = new role_user;
@@ -245,6 +250,12 @@ class UserController extends BaseController
                 $filename = $currentAvatar;
             }
 
+            if($request['is_all_warehouses'] == '1' || $request['is_all_warehouses'] == 'true'){
+                $is_all_warehouses = 1;
+            }else{
+                $is_all_warehouses = 0;
+            }
+
             User::whereId($id)->update([
                 'firstname' => $request['firstname'],
                 'lastname' => $request['lastname'],
@@ -254,7 +265,7 @@ class UserController extends BaseController
                 'password' => $pass,
                 'avatar' => $filename,
                 'statut' => $request['statut'],
-                'is_all_warehouses' => $request['is_all_warehouses']== 'true' ? 1 : 0,
+                'is_all_warehouses' => $is_all_warehouses,
                 'role_id' => $request['role'],
 
             ]);
@@ -273,14 +284,6 @@ class UserController extends BaseController
 
     }
 
-    //------------- Export USERS to EXCEL ---------\\
-
-    public function exportExcel(Request $request)
-    {
-        $this->authorizeForUser($request->user('api'), 'view', User::class);
-
-        return Excel::download(new UsersExport, 'Users.xlsx');
-    }
 
     //------------- UPDATE PROFILE ---------\\
 

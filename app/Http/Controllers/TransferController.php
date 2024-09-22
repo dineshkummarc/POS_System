@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\TransfersExport;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\product_warehouse;
@@ -18,7 +17,6 @@ use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Maatwebsite\Excel\Facades\Excel;
 
 class TransferController extends BaseController
 {
@@ -936,7 +934,9 @@ class TransferController extends BaseController
                     ->where('id', $detail->product_variant_id)->first();
 
                 $item_product ? $data['del'] = 0 : $data['del'] = 1;
-                $data['code'] = $productsVariants->name . '-' . $detail['product']['code'];
+                $data['name'] = '['.$productsVariants->name . ']' . $detail['product']['name'];
+                $data['code'] = $productsVariants->code;
+
                 $data['product_variant_id'] = $detail->product_variant_id;
 
                 if ($unit && $unit->operator == '/') {
@@ -956,6 +956,7 @@ class TransferController extends BaseController
                 $item_product ? $data['del'] = 0 : $data['del'] = 1;
                 $data['product_variant_id'] = null;
                 $data['code'] = $detail['product']['code'];
+                $data['name'] = $detail['product']['name'];
                
                 if ($unit && $unit->operator == '/') {
                     $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
@@ -971,7 +972,6 @@ class TransferController extends BaseController
             $data['detail_id'] = $detail_id += 1;
             $data['quantity'] = $detail->quantity;
             $data['product_id'] = $detail->product_id;
-            $data['name'] = $detail['product']['name'];
             $data['etat'] = 'current';
             $data['qte_copy'] = $detail->quantity;
             $data['unitPurchase'] = $unit->ShortName;
@@ -1062,13 +1062,14 @@ class TransferController extends BaseController
                 $productsVariants = ProductVariant::where('product_id', $detail->product_id)
                     ->where('id', $detail->product_variant_id)->first();
 
-                $data['code'] = $productsVariants->name . '-' . $detail['product']['code'];
+                $data['code'] = $productsVariants->code;
+                $data['name'] = '['.$productsVariants->name . ']' . $detail['product']['name'];
 
             } else {
                 $data['code'] = $detail['product']['code'];
+                $data['name'] = $detail['product']['name'];
             }
 
-            $data['name'] = $detail['product']['name'];
             $data['quantity'] = $detail->quantity;
             $data['unit'] = $unit->ShortName;
             $data['total'] = $detail->total;
@@ -1099,12 +1100,6 @@ class TransferController extends BaseController
         return response()->json(['warehouses' => $warehouses]);
     }
 
-    //-------------- Export All Transfers to EXCEL  ---------------\\
-
-    public function exportExcel(Request $request)
-    {
-        $this->authorizeForUser($request->user('api'), 'view', Transfer::class);
-        return Excel::download(new TransfersExport, 'List_Transfers.xlsx');
-    }
+  
 
 }

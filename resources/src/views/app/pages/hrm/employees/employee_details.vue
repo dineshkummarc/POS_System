@@ -393,7 +393,7 @@
                         variant="primary"
                         type="submit"
                         :disabled="SubmitProcessing"
-                      >{{$t('submit')}}</b-button>
+                      ><i class="i-Yes me-2 font-weight-bold"></i> {{$t('submit')}}</b-button>
                       <div v-once class="typo__p" v-if="SubmitProcessing">
                         <div class="spinner sm spinner-primary mt-3"></div>
                       </div>
@@ -471,7 +471,7 @@
                       variant="primary"
                       type="submit"
                       :disabled="Submit_Processing_social"
-                    >{{$t('submit')}}</b-button>
+                    ><i class="i-Yes me-2 font-weight-bold"></i> {{$t('submit')}}</b-button>
                     <div v-once class="typo__p" v-if="Submit_Processing_social">
                       <div class="spinner sm spinner-primary mt-3"></div>
                     </div>
@@ -719,7 +719,7 @@
                   variant="primary"
                   type="submit"
                   :disabled="Submit_Processing_Experience"
-                >{{$t('submit')}}</b-button>
+                ><i class="i-Yes me-2 font-weight-bold"></i> {{$t('submit')}}</b-button>
                 <div v-once class="typo__p" v-if="Submit_Processing_Experience">
                   <div class="spinner sm spinner-primary mt-3"></div>
                 </div>
@@ -822,7 +822,7 @@
                   variant="primary"
                   type="submit"
                   :disabled="Submit_Processing_Bank"
-                >{{$t('submit')}}</b-button>
+                ><i class="i-Yes me-2 font-weight-bold"></i> {{$t('submit')}}</b-button>
                 <div v-once class="typo__p" v-if="Submit_Processing_Bank">
                   <div class="spinner sm spinner-primary mt-3"></div>
                 </div>
@@ -1066,7 +1066,7 @@ export default {
     //---------------------- Get_departments_by_company ------------------------------\\
     Get_departments_by_company(value) {
       axios
-        .get("/core/Get_departments_by_company?id=" + value)
+        .get("/core/get_departments_by_company?id=" + value)
         .then(({ data }) => (this.departments = data));
     },
 
@@ -1080,7 +1080,7 @@ export default {
     //---------------------- Get_office_shift_by_company ------------------------------\\
     Get_office_shift_by_company(value) {
       axios
-        .get("/core/Get_office_shift_by_company?id=" + value)
+        .get("/core/get_office_shift_by_company?id=" + value)
         .then(({ data }) => (this.office_shifts = data));
     },
 

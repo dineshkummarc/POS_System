@@ -10,19 +10,11 @@
             v-if="currentUserPermissions && currentUserPermissions.includes('Purchase_Returns_edit')"
             title="Edit"
             class="btn btn-success btn-icon ripple btn-sm"
-            :to="{ name:'edit_purchase_return', params: { id: $route.params.id } }"
+            :to="'/app/purchase_return/edit/'+$route.params.id+'/'+purchase_return.purchase_id"
           >
             <i class="i-Edit"></i>
             <span>{{$t('EditReturn')}}</span>
           </router-link>
-          <button @click="Return_Email()" class="btn btn-info btn-icon ripple btn-sm">
-            <i class="i-Envelope-2"></i>
-            {{$t('Email')}}
-          </button>
-           <button @click="Return_SMS()" class="btn btn-info btn-icon ripple btn-sm">
-            <i class="i-Speach-Bubble"></i>
-            SMS
-          </button>
           <button @click="Return_PDF()" class="btn btn-primary btn-icon ripple btn-sm">
             <i class="i-File-TXT"></i> PDF
           </button>
@@ -66,6 +58,7 @@
               <h5 class="font-weight-bold">{{$t('Return_Info')}}</h5>
 
               <div>{{$t('Reference')}} : {{purchase_return.Ref}}</div>
+              <div>{{$t('Purchase_Ref')}} : {{purchase_return.purchase_ref}}</div>
               <div>
                 {{$t('Status')}} :
                 <span
@@ -91,14 +84,15 @@
           </b-row>
           <b-row class="mt-3">
             <b-col md="12">
-              <h5 class="font-weight-bold">{{$t('Order_Summary')}}</h5>
+              <h5 class="font-weight-bold">{{$t('list_product_returns')}}</h5>
+              <div class="alert alert-danger">{{$t('products_refunded_alert')}}</div>
               <div class="table-responsive">
                 <table class="table table-hover table-md">
                   <thead class="bg-gray-300">
                     <tr>
                       <th scope="col">{{$t('ProductName')}}</th>
                       <th scope="col">{{$t('Net_Unit_Cost')}}</th>
-                      <th scope="col">{{$t('Quantity')}}</th>
+                      <th scope="col">{{$t('Qty_return')}}</th>
                       <th scope="col">{{$t('Unitcost')}}</th>
                       <th scope="col">{{$t('Discount')}}</th>
                       <th scope="col">{{$t('Tax')}}</th>
@@ -227,7 +221,7 @@ export default {
       let id = this.$route.params.id;
     
        axios
-        .get(`Return_Purchase_PDF/${id}`, {
+        .get(`return_purchase_pdf/${id}`, {
           responseType: "blob", // important
           headers: {
             "Content-Type": "application/json"
@@ -271,69 +265,6 @@ export default {
       return `${value[0]}.${formated}`;
     },
 
-    //--------------------- Send Return on Email ------------------------\\
-
-    Return_Email() {
-      this.email.to = this.purchase_return.supplier_email;
-      this.email.Return_Ref = this.purchase_return.Ref;
-      this.email.supplier_name = this.purchase_return.supplier_name;
-      this.Send_Email();
-    },
-
-    Send_Email() {
-      // Start the progress bar.
-      NProgress.start();
-      NProgress.set(0.1);
-      let id = this.$route.params.id;
-      axios
-        .post("returns/purchase/send/email", {
-          id: id,
-          to: this.email.to,
-          client_name: this.email.supplier_name,
-          Ref: this.email.Return_Ref
-        })
-        .then(response => {
-          // Complete the animation of the  progress bar.
-          setTimeout(() => NProgress.done(), 500);
-          this.makeToast(
-            "success",
-            this.$t("Send.TitleEmail"),
-            this.$t("Success")
-          );
-        })
-        .catch(error => {
-          // Complete the animation of the  progress bar.
-          setTimeout(() => NProgress.done(), 500);
-          this.makeToast("danger", this.$t("SMTPIncorrect"), this.$t("Failed"));
-        });
-    },
-
-     //---------SMS notification
-     
-     Return_SMS() {
-      // Start the progress bar.
-      NProgress.start();
-      NProgress.set(0.1);
-      let id = this.$route.params.id;
-      axios
-        .post("returns/purchase/send/sms", {
-          id: id,
-        })
-        .then(response => {
-          // Complete the animation of the  progress bar.
-          setTimeout(() => NProgress.done(), 500);
-          this.makeToast(
-            "success",
-            this.$t("Send_SMS"),
-            this.$t("Success")
-          );
-        })
-        .catch(error => {
-          // Complete the animation of the  progress bar.
-          setTimeout(() => NProgress.done(), 500);
-          this.makeToast("danger", this.$t("sms_config_invalid"), this.$t("Failed"));
-        });
-    },
 
       //------ Toast
     makeToast(variant, msg, title) {

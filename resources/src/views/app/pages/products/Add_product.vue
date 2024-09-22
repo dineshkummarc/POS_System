@@ -7,7 +7,7 @@
       <b-form @submit.prevent="Submit_Product" enctype="multipart/form-data">
         <b-row>
           <b-col md="8" class="mb-2">
-            <b-card>
+            <b-card class="mt-3">
               <b-row>
                 <!-- Name -->
                 <b-col md="6" class="mb-2">
@@ -29,13 +29,40 @@
                   </validation-provider>
                 </b-col>
 
+                <!-- Barcode Symbology  -->
+                <b-col md="6" class="mb-2">
+                  <validation-provider name="Barcode Symbology" :rules="{ required: true}">
+                    <b-form-group
+                      slot-scope="{ valid, errors }"
+                      :label="$t('BarcodeSymbology') + ' ' + '*'"
+                    >
+                      <v-select
+                        :class="{'is-invalid': !!errors.length}"
+                        :state="errors[0] ? false : (valid ? true : null)"
+                        v-model="product.Type_barcode"
+                        :reduce="label => label.value"
+                        :placeholder="$t('Choose_Symbology')"
+                        :options="
+                            [
+                              {label: 'Code 128', value: 'CODE128'},
+                              {label: 'Code 39', value: 'CODE39'},
+                              {label: 'EAN8', value: 'EAN8'},
+                              {label: 'EAN13', value: 'EAN13'},
+                              {label: 'UPC', value: 'UPC'},
+                            ]"
+                      ></v-select>
+                      <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
+                    </b-form-group>
+                  </validation-provider>
+                </b-col>
+
                 <!-- Code Product"-->
                 <b-col md="6" class="mb-2">
-                  <validation-provider
-                    name="Code Product"
-                    :rules="{ required: true}"
-                  >
-                    <b-form-group slot-scope="{ valid, errors }" :label="$t('CodeProduct') + ' ' + '*'">
+                  <validation-provider name="Code Product" :rules="{ required: true}">
+                    <b-form-group
+                      slot-scope="{ valid, errors }"
+                      :label="$t('CodeProduct') + ' ' + '*'"
+                    >
                       <div class="input-group">
                         <b-form-input
                           :class="{'is-invalid': !!errors.length}"
@@ -44,15 +71,22 @@
                           type="text"
                           v-model="product.code"
                         ></b-form-input>
+                        <div class="input-group-append">
+                          <span class="input-group-text">
+                            <a @click="generateNumber()">
+                              <i class="i-Bar-Code cursor-pointer"></i>
+                            </a>
+                          </span>
+                        </div>
                         <b-form-invalid-feedback id="CodeProduct-feedback">{{ errors[0] }}</b-form-invalid-feedback>
                       </div>
-                        <span>{{$t('Scan_your_barcode_and_select_the_correct_symbology_below')}}</span>
-                        <b-alert
-                          show
-                          variant="danger"
-                          class="error mt-1"
-                          v-if="code_exist !=''"
-                        >{{code_exist}}</b-alert>
+                      <span>{{$t('Scan_your_barcode_and_select_the_correct_symbology_below')}}</span>
+                      <b-alert
+                        show
+                        variant="danger"
+                        class="error mt-1"
+                        v-if="code_exist !=''"
+                      >{{code_exist}}</b-alert>
                     </b-form-group>
                   </validation-provider>
                 </b-col>
@@ -60,7 +94,10 @@
                 <!-- Category -->
                 <b-col md="6" class="mb-2">
                   <validation-provider name="category" :rules="{ required: true}">
-                    <b-form-group slot-scope="{ valid, errors }" :label="$t('Categorie') + ' ' + '*'">
+                    <b-form-group
+                      slot-scope="{ valid, errors }"
+                      :label="$t('Categorie') + ' ' + '*'"
+                    >
                       <v-select
                         :class="{'is-invalid': !!errors.length}"
                         :state="errors[0] ? false : (valid ? true : null)"
@@ -84,151 +121,6 @@
                       :options="brands.map(brands => ({label: brands.name, value: brands.id}))"
                     />
                   </b-form-group>
-                </b-col>
-
-                <!-- Barcode Symbology  -->
-                <b-col md="6" class="mb-2">
-                  <validation-provider name="Barcode Symbology" :rules="{ required: true}">
-                    <b-form-group slot-scope="{ valid, errors }" :label="$t('BarcodeSymbology') + ' ' + '*'">
-                      <v-select
-                        :class="{'is-invalid': !!errors.length}"
-                        :state="errors[0] ? false : (valid ? true : null)"
-                        v-model="product.Type_barcode"
-                        :reduce="label => label.value"
-                        :placeholder="$t('Choose_Symbology')"
-                        :options="
-                            [
-                              {label: 'Code 128', value: 'CODE128'},
-                              {label: 'Code 39', value: 'CODE39'},
-                              {label: 'EAN8', value: 'EAN8'},
-                              {label: 'EAN13', value: 'EAN13'},
-                              {label: 'UPC', value: 'UPC'},
-                            ]"
-                      ></v-select>
-                      <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
-                    </b-form-group>
-                  </validation-provider>
-                </b-col>
-
-                <!-- Product Cost -->
-                <b-col md="6" class="mb-2">
-                  <validation-provider
-                    name="Product Cost"
-                    :rules="{ required: true , regex: /^\d*\.?\d*$/}"
-                    v-slot="validationContext"
-                  >
-                    <b-form-group :label="$t('ProductCost') + ' ' + '*'">
-                      <b-form-input
-                        :state="getValidationState(validationContext)"
-                        aria-describedby="ProductCost-feedback"
-                        label="Cost"
-                        :placeholder="$t('Enter_Product_Cost')"
-                        v-model="product.cost"
-                      ></b-form-input>
-                      <b-form-invalid-feedback
-                        id="ProductCost-feedback"
-                      >{{ validationContext.errors[0] }}</b-form-invalid-feedback>
-                    </b-form-group>
-                  </validation-provider>
-                </b-col>
-
-                <!-- Product Price -->
-                <b-col md="6" class="mb-2">
-                  <validation-provider
-                    name="Product Price"
-                    :rules="{ required: true , regex: /^\d*\.?\d*$/}"
-                    v-slot="validationContext"
-                  >
-                    <b-form-group :label="$t('ProductPrice') + ' ' + '*'">
-                      <b-form-input
-                        :state="getValidationState(validationContext)"
-                        aria-describedby="ProductPrice-feedback"
-                        label="Price"
-                        :placeholder="$t('Enter_Product_Price')"
-                        v-model="product.price"
-                      ></b-form-input>
-
-                      <b-form-invalid-feedback
-                        id="ProductPrice-feedback"
-                      >{{ validationContext.errors[0] }}</b-form-invalid-feedback>
-                    </b-form-group>
-                  </validation-provider>
-                </b-col>
-
-                <!-- Unit Product -->
-                <b-col md="6" class="mb-2">
-                  <validation-provider name="Unit Product" :rules="{ required: true}">
-                    <b-form-group slot-scope="{ valid, errors }" :label="$t('UnitProduct') + ' ' + '*'">
-                      <v-select
-                        :class="{'is-invalid': !!errors.length}"
-                        :state="errors[0] ? false : (valid ? true : null)"
-                        v-model="product.unit_id"
-                        class="required"
-                        required
-                        @input="Selected_Unit"
-                        :placeholder="$t('Choose_Unit_Product')"
-                        :reduce="label => label.value"
-                        :options="units.map(units => ({label: units.name, value: units.id}))"
-                      />
-                      <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
-                    </b-form-group>
-                  </validation-provider>
-                </b-col>
-
-                <!-- Unit Sale -->
-                <b-col md="6" class="mb-2">
-                  <validation-provider name="Unit Sale" :rules="{ required: true}">
-                    <b-form-group slot-scope="{ valid, errors }" :label="$t('UnitSale') + ' ' + '*'">
-                      <v-select
-                        :class="{'is-invalid': !!errors.length}"
-                        :state="errors[0] ? false : (valid ? true : null)"
-                        v-model="product.unit_sale_id"
-                        :placeholder="$t('Choose_Unit_Sale')"
-                        :reduce="label => label.value"
-                        :options="units_sub.map(units_sub => ({label: units_sub.name, value: units_sub.id}))"
-                      />
-                      <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
-                    </b-form-group>
-                  </validation-provider>
-                </b-col>
-
-                <!-- Unit Purchase -->
-                <b-col md="6" class="mb-2">
-                  <validation-provider name="Unit Purchase" :rules="{ required: true}">
-                    <b-form-group slot-scope="{ valid, errors }" :label="$t('UnitPurchase') + ' ' + '*'">
-                      <v-select
-                        :class="{'is-invalid': !!errors.length}"
-                        :state="errors[0] ? false : (valid ? true : null)"
-                        v-model="product.unit_purchase_id"
-                        :placeholder="$t('Choose_Unit_Purchase')"
-                        :reduce="label => label.value"
-                        :options="units_sub.map(units_sub => ({label: units_sub.name, value: units_sub.id}))"
-                      />
-                      <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
-                    </b-form-group>
-                  </validation-provider>
-                </b-col>
-
-                <!-- Stock Alert -->
-                <b-col md="6" class="mb-2">
-                  <validation-provider
-                    name="Stock Alert"
-                    :rules="{ regex: /^\d*\.?\d*$/}"
-                    v-slot="validationContext"
-                  >
-                    <b-form-group :label="$t('StockAlert')">
-                      <b-form-input
-                        :state="getValidationState(validationContext)"
-                        aria-describedby="StockAlert-feedback"
-                        label="Stock alert"
-                        :placeholder="$t('Enter_Stock_alert')"
-                        v-model="product.stock_alert"
-                      ></b-form-input>
-                      <b-form-invalid-feedback
-                        id="StockAlert-feedback"
-                      >{{ validationContext.errors[0] }}</b-form-invalid-feedback>
-                    </b-form-group>
-                  </validation-provider>
                 </b-col>
 
                 <!-- Order Tax -->
@@ -261,7 +153,10 @@
                 <!-- Tax Method -->
                 <b-col lg="6" md="6" sm="12" class="mb-2">
                   <validation-provider name="Tax Method" :rules="{ required: true}">
-                    <b-form-group slot-scope="{ valid, errors }" :label="$t('TaxMethod') + ' ' + '*'">
+                    <b-form-group
+                      slot-scope="{ valid, errors }"
+                      :label="$t('TaxMethod') + ' ' + '*'"
+                    >
                       <v-select
                         :class="{'is-invalid': !!errors.length}"
                         :state="errors[0] ? false : (valid ? true : null)"
@@ -289,47 +184,262 @@
                     ></textarea>
                   </b-form-group>
                 </b-col>
+              </b-row>
+            </b-card>
 
-                 <!-- Multiple Variants -->
-                  <b-col md="12 mb-2">
-                    <ValidationProvider rules vid="product" v-slot="x">
-                      <div class="form-check">
-                        <label class="checkbox checkbox-outline-primary">
-                          <input type="checkbox" v-model="product.is_variant">
-                          <h5>{{$t('ProductHasMultiVariants')}}</h5>
-                          <span class="checkmark"></span>
-                        </label>
-                      </div>
-                    </ValidationProvider>
-                  </b-col>
-                  <b-col md="12 mb-5" v-show="product.is_variant">
-                    <vue-tags-input
-                      placeholder="+ add"
+            <b-card class="mt-3">
+              <b-row>
+                <!-- Type  -->
+                <b-col md="6" class="mb-2">
+                  <validation-provider name="Type" :rules="{ required: true}">
+                    <b-form-group slot-scope="{ valid, errors }" :label="$t('type') + ' ' + '*'">
+                      <v-select
+                        :class="{'is-invalid': !!errors.length}"
+                        :state="errors[0] ? false : (valid ? true : null)"
+                        v-model="product.type"
+                        :reduce="label => label.value"
+                        :placeholder="$t('type')"
+                        :options="
+                            [
+                            {label: 'Standard Product', value: 'is_single'},
+                            {label: 'Variable Product', value: 'is_variant'},
+                            {label: 'Service Product', value: 'is_service'}
+                            ]"
+                      ></v-select>
+                      <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
+                    </b-form-group>
+                  </validation-provider>
+                </b-col>
+
+                <!-- Product Cost -->
+                <b-col md="6" class="mb-2" v-if="product.type == 'is_single'">
+                  <validation-provider
+                    name="Product Cost"
+                    :rules="{ required: true , regex: /^\d*\.?\d*$/}"
+                    v-slot="validationContext"
+                  >
+                    <b-form-group :label="$t('ProductCost') + ' ' + '*'">
+                      <b-form-input
+                        :state="getValidationState(validationContext)"
+                        aria-describedby="ProductCost-feedback"
+                        label="Cost"
+                        :placeholder="$t('Enter_Product_Cost')"
+                        v-model="product.cost"
+                      ></b-form-input>
+                      <b-form-invalid-feedback
+                        id="ProductCost-feedback"
+                      >{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                    </b-form-group>
+                  </validation-provider>
+                </b-col>
+
+                <!-- Product Price -->
+                <b-col
+                  md="6"
+                  class="mb-2"
+                  v-if="product.type == 'is_single' || product.type == 'is_service'"
+                >
+                  <validation-provider
+                    name="Product Price"
+                    :rules="{ required: true , regex: /^\d*\.?\d*$/}"
+                    v-slot="validationContext"
+                  >
+                    <b-form-group :label="$t('ProductPrice') + ' ' + '*'">
+                      <b-form-input
+                        :state="getValidationState(validationContext)"
+                        aria-describedby="ProductPrice-feedback"
+                        label="Price"
+                        :placeholder="$t('Enter_Product_Price')"
+                        v-model="product.price"
+                      ></b-form-input>
+
+                      <b-form-invalid-feedback
+                        id="ProductPrice-feedback"
+                      >{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                    </b-form-group>
+                  </validation-provider>
+                </b-col>
+
+                <!-- Unit Product -->
+                <b-col md="6" class="mb-2" v-if="product.type != 'is_service'">
+                  <validation-provider name="Unit Product" :rules="{ required: true}">
+                    <b-form-group
+                      slot-scope="{ valid, errors }"
+                      :label="$t('UnitProduct') + ' ' + '*'"
+                    >
+                      <v-select
+                        :class="{'is-invalid': !!errors.length}"
+                        :state="errors[0] ? false : (valid ? true : null)"
+                        v-model="product.unit_id"
+                        class="required"
+                        required
+                        @input="Selected_Unit"
+                        :placeholder="$t('Choose_Unit_Product')"
+                        :reduce="label => label.value"
+                        :options="units.map(units => ({label: units.name, value: units.id}))"
+                      />
+                      <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
+                    </b-form-group>
+                  </validation-provider>
+                </b-col>
+
+                <!-- Unit Sale -->
+                <b-col md="6" class="mb-2" v-if="product.type != 'is_service'">
+                  <validation-provider name="Unit Sale" :rules="{ required: true}">
+                    <b-form-group
+                      slot-scope="{ valid, errors }"
+                      :label="$t('UnitSale') + ' ' + '*'"
+                    >
+                      <v-select
+                        :class="{'is-invalid': !!errors.length}"
+                        :state="errors[0] ? false : (valid ? true : null)"
+                        v-model="product.unit_sale_id"
+                        :placeholder="$t('Choose_Unit_Sale')"
+                        :reduce="label => label.value"
+                        :options="units_sub.map(units_sub => ({label: units_sub.name, value: units_sub.id}))"
+                      />
+                      <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
+                    </b-form-group>
+                  </validation-provider>
+                </b-col>
+
+                <!-- Unit Purchase -->
+                <b-col md="6" class="mb-2" v-if="product.type != 'is_service'">
+                  <validation-provider name="Unit Purchase" :rules="{ required: true}">
+                    <b-form-group
+                      slot-scope="{ valid, errors }"
+                      :label="$t('UnitPurchase') + ' ' + '*'"
+                    >
+                      <v-select
+                        :class="{'is-invalid': !!errors.length}"
+                        :state="errors[0] ? false : (valid ? true : null)"
+                        v-model="product.unit_purchase_id"
+                        :placeholder="$t('Choose_Unit_Purchase')"
+                        :reduce="label => label.value"
+                        :options="units_sub.map(units_sub => ({label: units_sub.name, value: units_sub.id}))"
+                      />
+                      <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
+                    </b-form-group>
+                  </validation-provider>
+                </b-col>
+
+                <!-- Stock Alert -->
+                <b-col md="6" class="mb-2" v-if="product.type != 'is_service'">
+                  <validation-provider
+                    name="Stock Alert"
+                    :rules="{ regex: /^\d*\.?\d*$/}"
+                    v-slot="validationContext"
+                  >
+                    <b-form-group :label="$t('StockAlert')">
+                      <b-form-input
+                        :state="getValidationState(validationContext)"
+                        aria-describedby="StockAlert-feedback"
+                        label="Stock alert"
+                        :placeholder="$t('Enter_Stock_alert')"
+                        v-model="product.stock_alert"
+                      ></b-form-input>
+                      <b-form-invalid-feedback
+                        id="StockAlert-feedback"
+                      >{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                    </b-form-group>
+                  </validation-provider>
+                </b-col>
+
+                <div class="col-md-9 mb-3 mt-3" v-if="product.type == 'is_variant'">
+                  <div class="d-flex">
+                    <input
+                      style="height: 40px;"
+                      placeholder="Enter the Variant"
+                      type="text"
+                      name="variant"
                       v-model="tag"
-                      :tags="variants"
-                      class="tag-custom text-15"
-                      @adding-duplicate="showNotifDuplicate()"
-                      @tags-changed="newTags => variants = newTags"
-                    />
-                  </b-col>
+                      class="form-control"
+                    >
+                    <a
+                      style="color: #ffff;margin-left: 10px;"
+                      @click="add_variant(tag)"
+                      class="ms-3 btn btn-md btn-primary"
+                    >{{$t('Add')}}</a>
+                  </div>
+                </div>
 
-                  <!-- Product_Has_Imei_Serial_number -->
-                   <b-col md="12 mb-2">
-                    <ValidationProvider rules vid="product" v-slot="x">
-                      <div class="form-check">
-                        <label class="checkbox checkbox-outline-primary">
-                          <input type="checkbox" v-model="product.is_imei">
-                          <h5>{{$t('Product_Has_Imei_Serial_number')}}</h5>
-                          <span class="checkmark"></span>
-                        </label>
-                      </div>
-                    </ValidationProvider>
-                  </b-col>
-                  
+                <div class="col-md-9 mb-2" v-if="product.type == 'is_variant'">
+                  <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                      <thead class="bg-gray-300">
+                        <tr>
+                          <th scope="col">{{$t('Variant_code')}}</th>
+                          <th scope="col">{{$t('Variant_Name')}}</th>
+                          <th scope="col">{{$t('Variant_cost')}}</th>
+                          <th scope="col">{{$t('Variant_price')}}</th>
+                          <th scope="col"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-if="variants.length <=0">
+                          <td colspan="3">{{$t('NodataAvailable')}}</td>
+                        </tr>
+                        <tr v-for="variant in variants">
+                          <td>
+                            <input required class="form-control" v-model="variant.code">
+                          </td>
+                          <td>
+                            <input required  class="form-control" v-model="variant.text">
+                          </td>
+                          <td>
+                            <input required class="form-control" v-model="variant.cost">
+                          </td>
+                          <td>
+                            <input required class="form-control" v-model="variant.price">
+                          </td>
+                          <td>
+                            <a
+                              style="color: #ffff;"
+                              @click="delete_variant(variant.var_id)"
+                              class="btn btn-sm btn-danger"
+                              title="Delete"
+                            >
+                              <i class="i-Close-Window"></i>
+                            </a>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </b-row>
+            </b-card>
+           
+            <b-card class="mt-3">
+              <b-row>
+                <!-- Product_Has_Imei_Serial_number -->
+                <b-col md="12 mb-2">
+                  <ValidationProvider rules vid="product" v-slot="x">
+                    <div class="form-check">
+                      <label class="checkbox checkbox-outline-primary">
+                        <input type="checkbox" v-model="product.is_imei">
+                        <h5>{{$t('Product_Has_Imei_Serial_number')}}</h5>
+                        <span class="checkmark"></span>
+                      </label>
+                    </div>
+                  </ValidationProvider>
+                </b-col>
+
+                <!-- This_Product_Not_For_Selling -->
+                <b-col md="12 mb-2">
+                  <ValidationProvider rules vid="product" v-slot="x">
+                    <div class="form-check">
+                      <label class="checkbox checkbox-outline-primary">
+                        <input type="checkbox" v-model="product.not_selling">
+                        <h5>{{$t('This_Product_Not_For_Selling')}}</h5>
+                        <span class="checkmark"></span>
+                      </label>
+                    </div>
+                  </ValidationProvider>
+                </b-col>
               </b-row>
             </b-card>
           </b-col>
-
 
           <b-col md="4">
             <!-- upload-multiple-image -->
@@ -360,16 +470,15 @@
                       />
                     </div>
                   </b-col>
-                 
                 </b-row>
               </div>
             </b-card>
           </b-col>
           <b-col md="12" class="mt-3">
-             <b-button variant="primary" type="submit" :disabled="SubmitProcessing">{{$t('submit')}}</b-button>
-              <div v-once class="typo__p" v-if="SubmitProcessing">
-                <div class="spinner sm spinner-primary mt-3"></div>
-              </div>
+            <b-button variant="primary" type="submit" :disabled="SubmitProcessing"><i class="i-Yes me-2 font-weight-bold"></i> {{$t('submit')}}</b-button>
+            <div v-once class="typo__p" v-if="SubmitProcessing">
+              <div class="spinner sm spinner-primary mt-3"></div>
+            </div>
           </b-col>
         </b-row>
       </b-form>
@@ -395,7 +504,7 @@ export default {
       imageArray: [],
       change: false,
       isLoading: true,
-      SubmitProcessing:false,
+      SubmitProcessing: false,
       data: new FormData(),
       categories: [],
       units: [],
@@ -404,9 +513,10 @@ export default {
       roles: {},
       variants: [],
       product: {
+        type: "is_single",
         name: "",
         code: "",
-        Type_barcode: "",
+        Type_barcode: "CODE128",
         cost: "",
         price: "",
         brand_id: "",
@@ -420,7 +530,8 @@ export default {
         image: "",
         note: "",
         is_variant: false,
-        is_imei: false
+        is_imei: false,
+        not_selling: false
       },
       code_exist: ""
     };
@@ -432,6 +543,18 @@ export default {
   },
 
   methods: {
+
+     //------ Generate code
+     generateNumber() {
+      this.code_exist = "";
+      this.product.code = Math.floor(
+        Math.pow(10, 7) +
+          Math.random() *
+            (Math.pow(10, 8) - Math.pow(10, 7) - 1)
+      );
+    },
+
+
     //------------- Submit Validation Create Product
     Submit_Product() {
       this.$refs.Create_Product.validate().then(success => {
@@ -442,9 +565,56 @@ export default {
             this.$t("Failed")
           );
         } else {
-          this.Create_Product();
+
+            if (this.product.type == 'is_variant' && this.variants.length <= 0) {
+              this.makeToast("danger", "The variants array is required.", this.$t("Failed"));
+            }else{
+              this.Create_Product();
+            }
+
         }
       });
+    },
+
+    
+
+    add_variant(tag) {
+      if (
+        this.variants.length > 0 &&
+        this.variants.some(variant => variant.text === tag)
+      ) {
+        this.makeToast(
+          "warning",
+          this.$t("VariantDuplicate"),
+          this.$t("Warning")
+        );
+      } else {
+          if(this.tag != ''){
+            var variant_tag = {
+              var_id: this.variants.length + 1, // generate unique ID
+              text: tag
+            };
+            this.variants.push(variant_tag);
+            this.tag = "";
+          }else{
+
+            this.makeToast(
+              "warning",
+              "Please Enter the Variant",
+              this.$t("Warning")
+            );
+            
+          }
+      }
+    },
+    //-----------------------------------Delete variant------------------------------\\
+    delete_variant(var_id) {
+      
+      for (var i = 0; i < this.variants.length; i++) {
+        if (var_id === this.variants[i].var_id) {
+          this.variants.splice(i, 1);
+        }
+      }
     },
 
     //------ Toast
@@ -461,14 +631,7 @@ export default {
       return dirty || validated ? valid : null;
     },
 
-    //------Show Notification If Variant is Duplicate
-    showNotifDuplicate() {
-      this.makeToast(
-        "warning",
-        this.$t("VariantDuplicate"),
-        this.$t("Warning")
-      );
-    },
+
 
     //------ Event upload Image Success
     uploadImageSuccess(formData, index, fileList, imageArray) {
@@ -488,7 +651,7 @@ export default {
     //-------------- Product Get Elements
     GetElements() {
       axios
-        .get("Products/create")
+        .get("products/create")
         .then(response => {
           this.categories = response.data.categories;
           this.brands = response.data.brands;
@@ -506,7 +669,7 @@ export default {
     //---------------------- Get Sub Units with Unit id ------------------------------\\
     Get_Units_SubBase(value) {
       axios
-        .get("Get_Units_SubBase?id=" + value)
+        .get("get_sub_units_by_base?id=" + value)
         .then(({ data }) => (this.units_sub = data));
     },
 
@@ -526,20 +689,24 @@ export default {
       var self = this;
       self.SubmitProcessing = true;
 
-      if (self.product.is_variant && self.variants.length <= 0) {
+      if (self.product.type == 'is_variant' && self.variants.length > 0) {
+          self.product.is_variant = true;
+      }else{
         self.product.is_variant = false;
       }
+
+           
       // append objet product
       Object.entries(self.product).forEach(([key, value]) => {
-        self.data.append(key, value);
+          self.data.append(key, value);
       });
+
 
       // append array variants
       if (self.variants.length) {
-        for (var i = 0; i < self.variants.length; i++) {
-          self.data.append("variants[" + i + "]", self.variants[i].text);
-        }
+        self.data.append("variants", JSON.stringify(self.variants));
       }
+      
       //append array images
       if (self.images.length > 0) {
         for (var k = 0; k < self.images.length; k++) {
@@ -551,7 +718,7 @@ export default {
 
       // Send Data with axios
       axios
-        .post("Products", self.data)
+        .post("products", self.data)
         .then(response => {
           // Complete the animation of theprogress bar.
           NProgress.done();
@@ -566,11 +733,16 @@ export default {
         .catch(error => {
           // Complete the animation of theprogress bar.
           NProgress.done();
-          if (error.errors.code.length > 0) {
-            self.code_exist = error.errors.code[0];
-          }
-          this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
           self.SubmitProcessing = false;
+          if (error.errors.code && error.errors.code.length > 0) {
+            self.code_exist = error.errors.code[0];
+            this.makeToast("danger", error.errors.code[0], this.$t("Failed"));
+          }else if(error.errors.variants && error.errors.variants.length > 0){
+            this.makeToast("danger", error.errors.variants[0], this.$t("Failed"));
+          }else{
+            this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
+          }
+
         });
     }
   }, //end Methods

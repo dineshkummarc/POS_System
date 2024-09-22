@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\ShipmentsExport;
 use App\Models\Shipment;
 use App\Models\Sale;
 use App\utils\helpers;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Auth;
 
 class ShipmentController extends BaseController
@@ -200,16 +198,6 @@ class ShipmentController extends BaseController
     }
 
    
-
-    //----------- Export Excel ALL Shipments-------\\
-
-    public function exportExcel(Request $request)
-    {
-        $this->authorizeForUser($request->user('api'), 'view', Shipment::class);
-
-        return Excel::download(new ShipmentsExport, 'shipments.xlsx');
-    }
-
    //------------- Reference Number Order SALE -----------\\
 
    public function getNumberOrder()

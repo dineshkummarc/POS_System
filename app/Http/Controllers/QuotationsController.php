@@ -2,7 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\QuotationsExport;
+use Twilio\Rest\Client as Client_Twilio;
+use GuzzleHttp\Client as Client_guzzle;
+use App\Models\SMSMessage;
+use Infobip\Api\SendSmsApi;
+use Infobip\Configuration;
+use Infobip\Model\SmsAdvancedTextualRequest;
+use Infobip\Model\SmsDestination;
+use Infobip\Model\SmsTextualMessage;
+use Illuminate\Support\Str;
+use App\Models\EmailMessage;
+use App\Mail\CustomEmail;
+
 use App\Mail\QuotationMail;
 use App\Models\Client;
 use App\Models\Product;
@@ -18,13 +29,14 @@ use App\Models\User;
 use App\Models\UserWarehouse;
 use App\utils\helpers;
 use Carbon\Carbon;
-use Twilio\Rest\Client as Client_Twilio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
-use Maatwebsite\Excel\Facades\Excel;
+use \Nwidart\Modules\Facades\Module;
+use App\Models\sms_gateway;
 use DB;
 use PDF;
+use ArPHP\I18N\Arabic;
 
 class QuotationsController extends BaseController
 {
@@ -169,18 +181,18 @@ class QuotationsController extends BaseController
                 $unit = Unit::where('id', $value['sale_unit_id'])->first();
 
                 $orderDetails[] = [
-                    'quotation_id' => $order->id,
-                    'quantity' => $value['quantity'],
-                    'sale_unit_id' =>  $value['sale_unit_id'],
-                    'price' => $value['Unit_price'],
-                    'TaxNet' => $value['tax_percent'],
-                    'tax_method' => $value['tax_method'],
-                    'discount' => $value['discount'],
-                    'discount_method' => $value['discount_Method'],
-                    'product_id' => $value['product_id'],
-                    'product_variant_id' => $value['product_variant_id'],
-                    'total' => $value['subtotal'],
-                    'imei_number' => $value['imei_number'],
+                    'quotation_id'       => $order->id,
+                    'quantity'           => $value['quantity'],
+                    'sale_unit_id'       => $value['sale_unit_id']?$value['sale_unit_id']:NULL,
+                    'price'              => $value['Unit_price'],
+                    'TaxNet'             => $value['tax_percent'],
+                    'tax_method'         => $value['tax_method'],
+                    'discount'           => $value['discount'],
+                    'discount_method'    => $value['discount_Method'],
+                    'product_id'         => $value['product_id'],
+                    'product_variant_id' => $value['product_variant_id']?$value['product_variant_id']:NULL,
+                    'total'              => $value['subtotal'],
+                    'imei_number'        => $value['imei_number'],
                 ];
             }
             QuotationDetail::insert($orderDetails);
@@ -236,18 +248,18 @@ class QuotationsController extends BaseController
             // Update quotation with New request
             foreach ($new_quotation_details as $key => $product_detail) {
 
-                $QuoteDetail['quotation_id'] = $id;
-                $QuoteDetail['quantity'] = $product_detail['quantity'];
-                $QuoteDetail['sale_unit_id'] = $product_detail['sale_unit_id'];
-                $QuoteDetail['product_id'] = $product_detail['product_id'];
+                $QuoteDetail['quotation_id']       = $id;
+                $QuoteDetail['quantity']           = $product_detail['quantity'];
+                $QuoteDetail['sale_unit_id']       = $product_detail['sale_unit_id'];
+                $QuoteDetail['product_id']         = $product_detail['product_id'];
                 $QuoteDetail['product_variant_id'] = $product_detail['product_variant_id'];
-                $QuoteDetail['price'] = $product_detail['Unit_price'];
-                $QuoteDetail['TaxNet'] = $product_detail['tax_percent'];
-                $QuoteDetail['tax_method'] = $product_detail['tax_method'];
-                $QuoteDetail['discount'] = $product_detail['discount'];
-                $QuoteDetail['discount_method'] = $product_detail['discount_Method'];
-                $QuoteDetail['total'] = $product_detail['subtotal'];
-                $QuoteDetail['imei_number'] = $product_detail['imei_number'];
+                $QuoteDetail['price']              = $product_detail['Unit_price'];
+                $QuoteDetail['TaxNet']             = $product_detail['tax_percent'];
+                $QuoteDetail['tax_method']         = $product_detail['tax_method'];
+                $QuoteDetail['discount']           = $product_detail['discount'];
+                $QuoteDetail['discount_method']    = $product_detail['discount_Method'];
+                $QuoteDetail['total']              = $product_detail['subtotal'];
+                $QuoteDetail['imei_number']        = $product_detail['imei_number'];
 
                 if (!in_array($product_detail['id'], $old_detail_id)) {
                     QuotationDetail::Create($QuoteDetail);
@@ -331,27 +343,6 @@ class QuotationsController extends BaseController
         return response()->json(['success' => true]);
     }
 
-    //------------- Send Quotation on Email -----------\\
-
-    public function SendEmail(Request $request)
-    {
-
-        $this->authorizeForUser($request->user('api'), 'view', Quotation::class);
-
-        $quote = $request->all();
-        $pdf = $this->Quotation_pdf($request, $quote['id']);
-        $this->Set_config_mail(); // Set_config_mail => BaseController
-        $mail = Mail::to($request->to)->send(new QuotationMail($quote, $pdf));
-        return $mail;
-    }
-
-    //------------ Export Excel Quotations -------------\\
-
-    public function exportExcel(Request $request)
-    {
-        $this->authorizeForUser($request->user('api'), 'view', Quotation::class);
-        return Excel::download(new QuotationsExport, 'Quotations.xlsx');
-    }
 
     //---------------- Get Details Quotation-----------------\\
 
@@ -384,6 +375,7 @@ class QuotationsController extends BaseController
         $quote['client_phone'] = $quotation_data['client']->phone;
         $quote['client_adr'] = $quotation_data['client']->adresse;
         $quote['client_email'] = $quotation_data['client']->email;
+        $quote['client_tax'] = $quotation_data['client']->tax_number;
         $quote['warehouse'] = $quotation_data['warehouse']->name;
         $quote['GrandTotal'] = number_format($quotation_data['GrandTotal'], 2, '.', '');
 
@@ -396,7 +388,12 @@ class QuotationsController extends BaseController
                 $product_unit_sale_id = Product::with('unitSale')
                 ->where('id', $detail->product_id)
                 ->first();
-                $unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
+
+                if($product_unit_sale_id['unitSale']){
+                    $unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
+                }{
+                    $unit = NULL;
+                }
             }
 
             if ($detail->product_variant_id) {
@@ -404,17 +401,18 @@ class QuotationsController extends BaseController
                 $productsVariants = ProductVariant::where('product_id', $detail->product_id)
                     ->where('id', $detail->product_variant_id)->first();
 
-                $data['code'] = $productsVariants->name . '-' . $detail['product']['code'];
+                $data['code'] = $productsVariants->code;
+                $data['name'] = '['.$productsVariants->name . ']' . $detail['product']['name'];
 
             } else {
                 $data['code'] = $detail['product']['code'];
+                $data['name'] = $detail['product']['name'];
             }
             
-            $data['quantity'] = $detail->quantity;
-            $data['total'] = $detail->total;
-            $data['name'] = $detail['product']['name'];
-            $data['price'] = $detail->price;
-            $data['unit_sale'] = $unit->ShortName;
+            $data['quantity']  = $detail->quantity;
+            $data['total']     = $detail->total;
+            $data['price']     = $detail->price;
+            $data['unit_sale'] = $unit?$unit->ShortName:'';
 
             if ($detail->discount_method == '2') {
                 $data['DiscountNet'] = $detail->discount;
@@ -483,6 +481,7 @@ class QuotationsController extends BaseController
         $quote['client_phone'] = $Quotation['client']->phone;
         $quote['client_adr'] = $Quotation['client']->adresse;
         $quote['client_email'] = $Quotation['client']->email;
+        $quote['client_tax'] = $Quotation['client']->tax_number;
         $quote['TaxNet'] = number_format($Quotation->TaxNet, 2, '.', '');
         $quote['discount'] = number_format($Quotation->discount, 2, '.', '');
         $quote['shipping'] = number_format($Quotation->shipping, 2, '.', '');
@@ -501,7 +500,12 @@ class QuotationsController extends BaseController
                 $product_unit_sale_id = Product::with('unitSale')
                 ->where('id', $detail->product_id)
                 ->first();
-                $unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
+
+                if($product_unit_sale_id['unitSale']){
+                    $unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
+                }{
+                    $unit = NULL;
+                }
             }
 
             if ($detail->product_variant_id) {
@@ -509,16 +513,18 @@ class QuotationsController extends BaseController
                 $productsVariants = ProductVariant::where('product_id', $detail->product_id)
                     ->where('id', $detail->product_variant_id)->first();
 
-                $data['code'] = $productsVariants->name . '-' . $detail['product']['code'];
+                $data['code'] = $productsVariants->code;
+                $data['name'] = '['.$productsVariants->name . ']' . $detail['product']['name'];
+
             } else {
                 $data['code'] = $detail['product']['code'];
+                $data['name'] = $detail['product']['name'];
             }
-
+            
                 $data['detail_id'] = $detail_id += 1;
                 $data['quantity'] = number_format($detail->quantity, 2, '.', '');
                 $data['total'] = number_format($detail->total, 2, '.', '');
-                $data['name'] = $detail['product']['name'];
-                $data['unitSale'] = $unit->ShortName;
+                $data['unitSale'] = $unit?$unit->ShortName:'';
                 $data['price'] = number_format($detail->price, 2, '.', '');
 
             if ($detail->discount_method == '2') {
@@ -548,13 +554,23 @@ class QuotationsController extends BaseController
         $settings = Setting::where('deleted_at', '=', null)->first();
         $symbol = $helpers->Get_Currency_Code();
 
-        $pdf = \PDF::loadView('pdf.quotation_pdf', [
+        $Html = view('pdf.quotation_pdf', [
             'symbol' => $symbol,
             'setting' => $settings,
             'quote' => $quote,
             'details' => $details,
-        ]);
-        return $pdf->download('Quotation.pdf');
+        ])->render();
+
+        $arabic = new Arabic();
+        $p = $arabic->arIdentify($Html);
+
+        for ($i = count($p)-1; $i >= 0; $i-=2) {
+            $utf8ar = $arabic->utf8Glyphs(substr($Html, $p[$i-1], $p[$i] - $p[$i-1]));
+            $Html = substr_replace($Html, $utf8ar, $p[$i-1], $p[$i] - $p[$i-1]);
+        }
+
+        $pdf = PDF::loadHTML($Html);
+        return $pdf->download('quotation.pdf');
 
     }
 
@@ -575,10 +591,12 @@ class QuotationsController extends BaseController
         }
 
         $clients = Client::where('deleted_at', '=', null)->get(['id', 'name']);
+        $quotation_with_stock = Setting::where('deleted_at', '=', null)->first()->quotation_with_stock;
 
         return response()->json([
-            'clients' => $clients,
-            'warehouses' => $warehouses,
+            'clients'              => $clients,
+            'warehouses'           => $warehouses,
+            'quotation_with_stock' => $quotation_with_stock,
         ]);
     }
 
@@ -637,11 +655,18 @@ class QuotationsController extends BaseController
              //check if detail has sale_unit_id Or Null
              if($detail->sale_unit_id !== null){
                 $unit = Unit::where('id', $detail->sale_unit_id)->first();
+                $data['no_unit'] = 1;
             }else{
                 $product_unit_sale_id = Product::with('unitSale')
                 ->where('id', $detail->product_id)
                 ->first();
-                $unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
+
+                if($product_unit_sale_id['unitSale']){
+                    $unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
+                }{
+                    $unit = NULL;
+                }
+
                 $data['no_unit'] = 0;
             }
 
@@ -657,14 +682,16 @@ class QuotationsController extends BaseController
 
                 $item_product ? $data['del'] = 0 : $data['del'] = 1;
                 $data['product_variant_id'] = $detail->product_variant_id;
-                $data['code'] = $productsVariants->name . '-' . $detail['product']['code'];
+
+                $data['code'] = $productsVariants->code;
+                $data['name'] = '['.$productsVariants->name . ']' . $detail['product']['name'];
 
                 if ($unit && $unit->operator == '/') {
-                    $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
+                    $stock = $item_product ? $item_product->qte * $unit->operator_value : 0;
                 } else if ($unit && $unit->operator == '*') {
-                    $data['stock'] = $item_product ? $item_product->qte / $unit->operator_value : 0;
+                    $stock = $item_product ? $item_product->qte / $unit->operator_value : 0;
                 } else {
-                    $data['stock'] = 0;
+                    $stock = 0;
                 }
 
             } else {
@@ -677,27 +704,29 @@ class QuotationsController extends BaseController
                 $item_product ? $data['del'] = 0 : $data['del'] = 1;
                 $data['product_variant_id'] = null;
                 $data['code'] = $detail['product']['code'];
+                $data['name'] = $detail['product']['name'];
 
                 if ($unit && $unit->operator == '/') {
-                    $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
+                    $stock = $item_product ? $item_product->qte * $unit->operator_value : 0;
                 } else if ($unit && $unit->operator == '*') {
-                    $data['stock'] = $item_product ? $item_product->qte / $unit->operator_value : 0;
+                    $stock = $item_product ? $item_product->qte / $unit->operator_value : 0;
                 } else {
-                    $data['stock'] = 0;
+                    $stock = 0;
                 }
 
             }
 
             $data['id'] = $detail->id;
+            $data['stock'] = $detail['product']['type'] !='is_service'?$stock:'---';
+            $data['product_type'] = $detail['product']['type'];
             $data['detail_id'] = $detail_id += 1;
             $data['product_id'] = $detail->product_id;
             $data['quantity'] = $detail->quantity;
-            $data['name'] = $detail['product']['name'];
             $data['etat'] = 'current';
             $data['qte_copy'] = $detail->quantity;
             $data['total'] = $detail->total;
-            $data['unitSale'] = $unit->ShortName;
-            $data['sale_unit_id'] = $unit->id;
+            $data['unitSale'] = $unit?$unit->ShortName:'';
+            $data['sale_unit_id'] = $unit?$unit->id:'';
             $data['is_imei'] = $detail['product']['is_imei'];
             $data['imei_number'] = $detail->imei_number;
 
@@ -746,27 +775,181 @@ class QuotationsController extends BaseController
         ]);
     }
 
-     //-------------------Sms Notifications -----------------\\
 
-     public function Send_SMS(Request $request)
-     {
-         $Quotation = Quotation::where('deleted_at', '=', null)->findOrFail($request->id);
-         $url = url('/api/Quote_PDF/' . $request->id);
-         $receiverNumber = $Quotation['client']->phone;
-         $message = "Dear" .' '.$Quotation['client']->name." \n We are contacting you in regard to a Quotation #".$Quotation->Ref.' '.$url.' '. "that has been created on your account. \n We look forward to conducting future business with you.";
-         try {
-   
-             $account_sid = env("TWILIO_SID");
-             $auth_token = env("TWILIO_TOKEN");
-             $twilio_number = env("TWILIO_FROM");
-   
-             $client = new Client_Twilio($account_sid, $auth_token);
-             $client->messages->create($receiverNumber, [
-                 'from' => $twilio_number, 
-                 'body' => $message]);
+    //------------- Send Quotation on Email -----------\\
+
+    public function SendEmail(Request $request)
+    {
+        $this->authorizeForUser($request->user('api'), 'view', Quotation::class);
+
+        //Quotation
+        $quotation = Quotation::with('client')->where('deleted_at', '=', null)->findOrFail($request->id);
+
+        $helpers = new helpers();
+        $currency = $helpers->Get_Currency();
+
+         //settings
+         $settings = Setting::where('deleted_at', '=', null)->first();
      
-         } catch (Exception $e) {
-             return response()->json(['message' => $e->getMessage()], 500);
+         //the custom msg of quotation
+         $emailMessage  = EmailMessage::where('name', 'quotation')->first();
+ 
+         if($emailMessage){
+             $message_body = $emailMessage->body;
+             $message_subject = $emailMessage->subject;
+         }else{
+             $message_body = '';
+             $message_subject = '';
          }
-     }
+ 
+         //Tags
+         $random_number = Str::random(10);
+         $quotation_url = url('/api/quote_pdf/' . $request->id.'?'.$random_number);
+         $quotation_number = $quotation->Ref;
+ 
+         $total_amount = $currency .' '.number_format($quotation->GrandTotal, 2, '.', ',');
+        
+         $contact_name = $quotation['client']->name;
+         $business_name = $settings->CompanyName;
+ 
+         //receiver email
+         $receiver_email = $quotation['client']->email;
+ 
+         //replace the text with tags
+         $message_body = str_replace('{contact_name}', $contact_name, $message_body);
+         $message_body = str_replace('{business_name}', $business_name, $message_body);
+         $message_body = str_replace('{quotation_url}', $quotation_url, $message_body);
+         $message_body = str_replace('{quotation_number}', $quotation_number, $message_body);
+         $message_body = str_replace('{total_amount}', $total_amount, $message_body);
+
+        $email['subject'] = $message_subject;
+        $email['body'] = $message_body;
+        $email['company_name'] = $business_name;
+
+        $this->Set_config_mail(); 
+
+        $mail = Mail::to($receiver_email)->send(new CustomEmail($email));
+
+        return $mail;
+    }
+
+    //-------------------Sms Notifications -----------------\\
+
+    public function Send_SMS(Request $request)
+    {
+        $this->authorizeForUser($request->user('api'), 'view', Quotation::class);
+
+        //Quotation
+        $quotation = Quotation::with('client')->where('deleted_at', '=', null)->findOrFail($request->id);
+
+        $helpers = new helpers();
+        $currency = $helpers->Get_Currency();
+
+        //settings
+        $settings = Setting::where('deleted_at', '=', null)->first();
+
+        $default_sms_gateway = sms_gateway::where('id' , $settings->sms_gateway)
+            ->where('deleted_at', '=', null)->first();
+
+        //the custom msg of quotation
+        $smsMessage  = SMSMessage::where('name', 'quotation')->first();
+
+        if($smsMessage){
+            $message_text = $smsMessage->text;
+        }else{
+            $message_text = '';
+        }
+
+        //Tags
+        $random_number = Str::random(10);
+        $quotation_url = url('/api/quote_pdf/' . $request->id.'?'.$random_number);
+        $quotation_number = $quotation->Ref;
+
+        $total_amount = $currency .' '.number_format($quotation->GrandTotal, 2, '.', ',');
+        
+        $contact_name = $quotation['client']->name;
+        $business_name = $settings->CompanyName;
+
+        //receiver phone
+        $receiverNumber = $quotation['client']->phone;
+
+        //replace the text with tags
+        $message_text = str_replace('{contact_name}', $contact_name, $message_text);
+        $message_text = str_replace('{business_name}', $business_name, $message_text);
+        $message_text = str_replace('{quotation_url}', $quotation_url, $message_text);
+        $message_text = str_replace('{quotation_number}', $quotation_number, $message_text);
+        $message_text = str_replace('{total_amount}', $total_amount, $message_text);
+
+        //twilio
+        if($default_sms_gateway->title == "twilio"){
+            try {
+
+                $account_sid = env("TWILIO_SID");
+                $auth_token = env("TWILIO_TOKEN");
+                $twilio_number = env("TWILIO_FROM");
+
+                $client = new Client_Twilio($account_sid, $auth_token);
+                $client->messages->create($receiverNumber, [
+                    'from' => $twilio_number, 
+                    'body' => $message_text]);
+
+            } catch (Exception $e) {
+                return response()->json(['message' => $e->getMessage()], 500);
+            }
+            //nexmo
+        }elseif($default_sms_gateway->title == "nexmo"){
+                try {
+
+                    $basic  = new \Nexmo\Client\Credentials\Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
+                    $client = new \Nexmo\Client($basic);
+                    $nexmo_from = env("NEXMO_FROM");
+
+                    $message = $client->message()->send([
+                        'to' => $receiverNumber,
+                        'from' => $nexmo_from,
+                        'text' => $message_text
+                    ]);
+                            
+                } catch (Exception $e) {
+                    return response()->json(['message' => $e->getMessage()], 500);
+                }
+
+        //---- infobip
+        }elseif($default_sms_gateway->title == "infobip"){
+
+                $BASE_URL = env("base_url");
+                $API_KEY = env("api_key");
+                $SENDER = env("sender_from");
+
+                $configuration = (new Configuration())
+                    ->setHost($BASE_URL)
+                    ->setApiKeyPrefix('Authorization', 'App')
+                    ->setApiKey('Authorization', $API_KEY);
+                
+                $client = new Client_guzzle();
+                
+                $sendSmsApi = new SendSMSApi($client, $configuration);
+                $destination = (new SmsDestination())->setTo($receiverNumber);
+                $message = (new SmsTextualMessage())
+                    ->setFrom($SENDER)
+                    ->setText($message_text)
+                    ->setDestinations([$destination]);
+                    
+                $request = (new SmsAdvancedTextualRequest())->setMessages([$message]);
+                
+                try {
+                    $smsResponse = $sendSmsApi->sendSmsMessage($request);
+                    echo ("Response body: " . $smsResponse);
+                } catch (Throwable $apiException) {
+                    echo("HTTP Code: " . $apiException->getCode() . "\n");
+                }
+                
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    
+
 }
+

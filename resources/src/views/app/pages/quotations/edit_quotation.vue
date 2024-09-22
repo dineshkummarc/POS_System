@@ -110,7 +110,7 @@
                         </tr>
                         <tr
                           v-for="detail in details"
-                          :class="{'row_deleted': detail.del === 1}"
+                          :class="{'row_deleted': detail.del === 1 || (detail.no_unit === 0 && detail.product_type != 'is_service')}"
                           :key="detail.detail_id"
                         >
                           <td>{{detail.detail_id}}</td>
@@ -118,19 +118,17 @@
                             <span>{{detail.code}}</span>
                             <br>
                             <span class="badge badge-success">{{detail.name}}</span>
-                            <i @click="Modal_Updat_Detail(detail)" class="i-Edit"></i>
                           </td>
                           <td>{{currentUser.currency}} {{formatNumber(detail.Net_price, 3)}}</td>
                           <td>
-                            <span
-                              class="badge badge-outline-warning"
-                            >{{detail.stock}} {{detail.unitSale}}</span>
+                            <span class="badge badge-warning" v-if="detail.product_type == 'is_service'">----</span>
+                            <span class="badge badge-warning" v-else>{{detail.stock}} {{detail.unitSale}}</span>
                           </td>
                           <td>
                             <div class="quantity">
                               <b-input-group>
                                 <b-input-group-prepend>
-                                  <span
+                                  <span v-show="detail.no_unit !== 0 || detail.product_type == 'is_service'"
                                     class="btn btn-primary btn-sm"
                                     @click="decrement(detail ,detail.detail_id)"
                                   >-</span>
@@ -141,10 +139,10 @@
                                   :min="0.00"
                                   :max="detail.stock"
                                   v-model.number="detail.quantity"
-                                  :disabled="detail.del === 1"
+                                   :disabled="detail.del === 1 || (detail.no_unit === 0 && detail.product_type != 'is_service')"
                                 >
                                 <b-input-group-append>
-                                  <span
+                                  <span v-show="detail.no_unit !== 0 || detail.product_type == 'is_service'"
                                     class="btn btn-primary btn-sm"
                                     @click="increment(detail ,detail.detail_id)"
                                   >+</span>
@@ -155,14 +153,10 @@
                           <td>{{currentUser.currency}} {{formatNumber(detail.DiscountNet * detail.quantity, 2)}}</td>
                           <td>{{currentUser.currency}} {{formatNumber(detail.taxe * detail.quantity, 2)}}</td>
                           <td>{{currentUser.currency}} {{detail.subtotal.toFixed(2)}}</td>
-                          <td>
-                            <a
-                              @click="delete_Product_Detail(detail.detail_id)"
-                              class="btn btn-icon btn-sm"
-                              title="Delete"
-                            >
-                              <i class="i-Close-Window text-25 text-danger"></i>
-                            </a>
+                           <td v-show="detail.no_unit !== 0 || detail.product_type == 'is_service'">
+                            <i v-if="currentUserPermissions && currentUserPermissions.includes('edit_product_quotation')"
+                            @click="Modal_Updat_Detail(detail)" class="i-Edit text-25 text-success cursor-pointer"></i>
+                            <i @click="delete_Product_Detail(detail.detail_id)" class="i-Close-Window text-25 text-danger cursor-pointer"></i>
                           </td>
                         </tr>
                       </tbody>
@@ -202,7 +196,7 @@
                 </div>
 
                  <!-- Order Tax  -->
-                <b-col lg="4" md="4" sm="12" class="mb-3">
+                <b-col lg="4" md="4" sm="12" class="mb-3" v-if="currentUserPermissions && currentUserPermissions.includes('edit_tax_discount_shipping_quotation')">
                   <validation-provider
                     name="Order Tax"
                     :rules="{ regex: /^\d*\.?\d*$/}"
@@ -226,7 +220,7 @@
                 </b-col>
 
                 <!-- Discount -->
-                <b-col lg="4" md="4" sm="12" class="mb-3">
+                <b-col lg="4" md="4" sm="12" class="mb-3" v-if="currentUserPermissions && currentUserPermissions.includes('edit_tax_discount_shipping_quotation')">
                   <validation-provider
                     name="Discount"
                     :rules="{ regex: /^\d*\.?\d*$/}"
@@ -250,7 +244,7 @@
                 </b-col>
 
                 <!-- Shipping  -->
-                <b-col lg="4" md="4" sm="12" class="mb-3">
+                <b-col lg="4" md="4" sm="12" class="mb-3" v-if="currentUserPermissions && currentUserPermissions.includes('edit_tax_discount_shipping_quotation')">
                   <validation-provider
                     name="Shipping"
                     :rules="{ regex: /^\d*\.?\d*$/}"
@@ -306,7 +300,7 @@
                 </b-col>
                 <b-col md="12">
                   <b-form-group>
-                    <b-button variant="primary" @click="Submit_Quotation" :disabled="SubmitProcessing">{{$t('submit')}}</b-button>
+                    <b-button variant="primary" @click="Submit_Quotation" :disabled="SubmitProcessing"><i class="i-Yes me-2 font-weight-bold"></i> {{$t('submit')}}</b-button>
                     <div v-once class="typo__p" v-if="SubmitProcessing">
                       <div class="spinner sm spinner-primary mt-3"></div>
                     </div>
@@ -438,7 +432,7 @@
 
             <b-col md="12">
               <b-form-group>
-                <b-button variant="primary" type="submit" :disabled="Submit_Processing_detail">{{$t('submit')}}</b-button>
+                <b-button variant="primary" type="submit" :disabled="Submit_Processing_detail"><i class="i-Yes me-2 font-weight-bold"></i> {{$t('submit')}}</b-button>
                 <div v-once class="typo__p" v-if="Submit_Processing_detail">
                   <div class="spinner sm spinner-primary mt-3"></div>
                 </div>
@@ -492,6 +486,7 @@ export default {
       product: {
         id: "",
         code: "",
+        product_type: "",
         stock: "",
         quantity: 1,
         discount: "",
@@ -518,7 +513,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["currentUser"])
+    ...mapGetters(["currentUserPermissions","currentUser"])
   },
 
   methods: {
@@ -666,7 +661,7 @@ export default {
             this.timer = null;
       }
 
-      if (this.search_input.length < 1) {
+      if (this.search_input.length < 2) {
 
         return this.product_filter= [];
       }
@@ -711,15 +706,21 @@ export default {
       ) {
         this.makeToast("warning", this.$t("AlreadyAdd"), this.$t("Warning"));
       } else {
-        this.product.code = result.code;
-        this.product.stock = result.qte_sale;
-        if (result.qte_sale < 1) {
-          this.product.quantity = result.qte_sale;
-        } else {
-          this.product.quantity = 1;
-        }
+          if( result.product_type =='is_service'){
+            this.product.quantity = 1;
+            this.product.code = result.code;
+          }else{
+
+            this.product.code = result.code;
+            this.product.stock = result.qte_sale;
+            if (result.qte_sale < 1) {
+              this.product.quantity = result.qte_sale;
+            } else {
+              this.product.quantity = 1;
+            }
+          }
         this.product.product_variant_id = result.product_variant_id;
-        this.Get_Product_Details(result.id);
+        this.Get_Product_Details(result.id, result.product_variant_id);
       }
 
       this.search_input= '';
@@ -741,7 +742,7 @@ export default {
         NProgress.start();
         NProgress.set(0.1);
       axios
-        .get("Products/Warehouse/" + id + "?stock=" + 1)
+        .get("get_Products_by_warehouse/" + id + "?stock=" + 1 + "&product_service=" + 1)
          .then(response => {
             this.products = response.data;
              NProgress.done();
@@ -1014,8 +1015,8 @@ export default {
 
     //---------------------------------Get Product Details ------------------------\\
 
-    Get_Product_Details(product_id) {
-      axios.get("Products/" + product_id).then(response => {
+    Get_Product_Details(product_id, variant_id) {
+      axios.get("/show_product_data/" + product_id +"/"+ variant_id).then(response => {
         this.product.del = 0;
         this.product.id = 0;
         this.product.discount = 0;
@@ -1024,6 +1025,7 @@ export default {
         this.product.discount_Method = "2";
         this.product.product_id = response.data.id;
         this.product.name = response.data.name;
+        this.product.product_type = response.data.product_type;
         this.product.Net_price = response.data.Net_price;
         this.product.Unit_price = response.data.Unit_price;
         this.product.taxe = response.data.tax_price;

@@ -239,6 +239,13 @@
                       <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>
                     </router-link>
                   </div>
+                  <div v-else-if="props.column.field == 'sale_ref' && props.row.sale_id">
+                    <router-link
+                      :to="'/app/sales/detail/'+props.row.sale_id"
+                    >
+                      <span class="ul-btn__text ml-1">{{props.row.sale_ref}}</span>
+                    </router-link>
+                  </div>
                 </template>
               </vue-good-table>
             </b-tab>
@@ -459,6 +466,12 @@ export default {
           sortable: false
         },
         {
+          label: this.$t("Sale_Ref"),
+          field: "sale_ref",
+          tdClass: "text-left",
+          thClass: "text-left"
+        },
+        {
           label: this.$t("warehouse"),
           field: "warehouse_name",
           tdClass: "text-left",
@@ -598,6 +611,7 @@ export default {
       let columns = [
         { title: "Ref", dataKey: "Ref" },
         { title: "Client", dataKey: "client_name" },
+        { title: "sale_ref", dataKey: "sale_ref" },
         { title: "Warehouse", dataKey: "warehouse_name" },
         { title: "Total", dataKey: "GrandTotal" },
         { title: "Paid", dataKey: "paid_amount" },
@@ -675,7 +689,7 @@ export default {
     Get_Sales(page) {
       axios
         .get(
-          "/report/client_Sales?page=" +
+          "/report/client_sales?page=" +
             page +
             "&limit=" +
             this.limit_sales +

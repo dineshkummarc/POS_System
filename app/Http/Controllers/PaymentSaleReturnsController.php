@@ -1,7 +1,6 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Exports\Payment_Sale_Return_Export;
 use Twilio\Rest\Client as Client_Twilio;
 use App\Mail\PaymentReturn;
 use App\Models\Client;
@@ -14,9 +13,11 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
-use Maatwebsite\Excel\Facades\Excel;
+use \Nwidart\Modules\Facades\Module;
+use App\Models\sms_gateway;
 use DB;
 use PDF;
+use ArPHP\I18N\Arabic;
 
 class PaymentSaleReturnsController extends BaseController
 {
@@ -96,8 +97,8 @@ class PaymentSaleReturnsController extends BaseController
             $item['Ref_return'] = $Payment['SaleReturn']->Ref;
             $item['client_name'] = $Payment['SaleReturn']['client']->name;
             $item['Reglement'] = $Payment->Reglement;
-            $item['montant'] = number_format($Payment->montant, 2, '.', '');
-
+            $item['montant'] = $Payment->montant;
+            // $item['montant'] = number_format($Payment->montant, 2, '.', '');
             $data[] = $item;
         }
 
@@ -288,7 +289,11 @@ class PaymentSaleReturnsController extends BaseController
 
         $this->authorizeForUser($request->user('api'), 'view', PaymentSaleReturns::class);
 
-        $payment = $request->all();
+        $payment['id'] = $request->id;
+        $payment['Ref'] = $request->Ref;
+        $settings = Setting::where('deleted_at', '=', null)->first();
+        $payment['company_name'] = $settings->CompanyName;
+        
         $pdf = $this->payment_return($request, $payment['id']);
         $this->Set_config_mail(); // Set_config_mail => BaseController
         $mail = Mail::to($request->to)->send(new PaymentReturn($payment, $pdf));
@@ -316,47 +321,74 @@ class PaymentSaleReturnsController extends BaseController
         $settings = Setting::where('deleted_at', '=', null)->first();
         $symbol = $helpers->Get_Currency_Code();
 
-        $pdf = \PDF::loadView('pdf.Payment_Sale_Return', [
-            'symbol' => $symbol,
+        $Html = view('pdf.Payment_Sale_Return', [
+            'symbol'  => $symbol,
             'setting' => $settings,
             'payment' => $payment_data,
-        ]);
+        ])->render();
+
+        $arabic = new Arabic();
+        $p = $arabic->arIdentify($Html);
+
+        for ($i = count($p)-1; $i >= 0; $i-=2) {
+            $utf8ar = $arabic->utf8Glyphs(substr($Html, $p[$i-1], $p[$i] - $p[$i-1]));
+            $Html = substr_replace($Html, $utf8ar, $p[$i-1], $p[$i] - $p[$i-1]);
+        }
+
+        $pdf = PDF::loadHTML($Html);
 
         return $pdf->download('Payment_Sale_Return.pdf');
 
-    }
 
-    //----------- Export To Excel Payment Sale Return --------------\\
-
-    public function exportExcel(Request $request)
-    {
-        $this->authorizeForUser($request->user('api'), 'view', PaymentSaleReturns::class);
-
-        return Excel::download(new Payment_Sale_Return_Export, 'Payment_Sale_Returns.xlsx');
     }
 
      //-------------------Sms Notifications -----------------\\
      public function Send_SMS(Request $request)
      {
         $payment = PaymentSaleReturns::with('SaleReturn', 'SaleReturn.client')->findOrFail($request->id);
+        $settings = Setting::where('deleted_at', '=', null)->first();
+        $gateway = sms_gateway::where('id' , $settings->sms_gateway)
+        ->where('deleted_at', '=', null)->first();
 
-         $url = url('/api/payment_Return_sale_PDF/' . $request->id);
+         $url = url('/api/payment_return_sale_pdf/' . $request->id);
          $receiverNumber = $payment['SaleReturn']['client']->phone;
          $message = "Dear" .' '.$payment['SaleReturn']['client']->name." \n We are contacting you in regard to a Payment #".$payment['SaleReturn']->Ref.' '.$url.' '. "that has been created on your account. \n We look forward to conducting future business with you.";
-         try {
-   
-             $account_sid = env("TWILIO_SID");
-             $auth_token = env("TWILIO_TOKEN");
-             $twilio_number = env("TWILIO_FROM");
-   
-             $client = new Client_Twilio($account_sid, $auth_token);
-             $client->messages->create($receiverNumber, [
-                 'from' => $twilio_number, 
-                 'body' => $message]);
-     
-         } catch (Exception $e) {
-             return response()->json(['message' => $e->getMessage()], 500);
-         }
-     }
+         
+          //twilio
+        if($gateway->title == "twilio"){
+            try {
+    
+                $account_sid = env("TWILIO_SID");
+                $auth_token = env("TWILIO_TOKEN");
+                $twilio_number = env("TWILIO_FROM");
+    
+                $client = new Client_Twilio($account_sid, $auth_token);
+                $client->messages->create($receiverNumber, [
+                    'from' => $twilio_number, 
+                    'body' => $message]);
+        
+            } catch (Exception $e) {
+                return response()->json(['message' => $e->getMessage()], 500);
+            }
+
+        //nexmo
+        }elseif($gateway->title == "nexmo"){
+            try {
+
+                $basic  = new \Nexmo\Client\Credentials\Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
+                $client = new \Nexmo\Client($basic);
+                $nexmo_from = env("NEXMO_FROM");
+        
+                $message = $client->message()->send([
+                    'to' => $receiverNumber,
+                    'from' => $nexmo_from,
+                    'text' => $message
+                ]);
+                        
+            } catch (Exception $e) {
+                return response()->json(['message' => $e->getMessage()], 500);
+            }
+        }
+    }
 
 }

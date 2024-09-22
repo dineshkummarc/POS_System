@@ -14,7 +14,7 @@ class AddShippingStatusToSales extends Migration
     public function up()
     {
         Schema::table('sales', function (Blueprint $table) {
-            $table->string('shipping_status')->nullable();
+            $table->string('shipping_status')->after('statut')->nullable();
         });
     }
 

@@ -25,6 +25,37 @@
       }"
         styleClass="tableOne table-hover vgt-table mt-3"
       >
+
+       <div slot="table-actions" class="mt-2 mb-3 quantity_alert_warehouse">
+        <!-- warehouse -->
+        <b-form-group :label="$t('warehouse')">
+          <v-select
+            @input="Selected_Warehouse"
+            v-model="warehouse_id"
+            :reduce="label => label.value"
+            :placeholder="$t('Choose_Warehouse')"
+            :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))"
+          />
+        </b-form-group>
+      </div>
+
+       <div slot="table-actions" class="mt-2 mb-3">
+        
+          <b-button @click="stock_report_PDF()" size="sm" variant="outline-success ripple m-1">
+            <i class="i-File-Copy"></i> PDF
+          </b-button>
+           <vue-excel-xlsx
+              class="btn btn-sm btn-outline-danger ripple m-1"
+              :data="reports"
+              :columns="columns"
+              :file-name="'stock_report'"
+              :file-type="'xlsx'"
+              :sheet-name="'stock_report'"
+              >
+              <i class="i-File-Excel"></i> EXCEL
+          </vue-excel-xlsx>
+        </div>
+
         <template slot="table-row" slot-scope="props">
           <span v-if="props.column.field == 'actions'">
             <router-link title="Report" :to="'/app/reports/detail_stock/'+props.row.id">
@@ -40,6 +71,8 @@
 
 <script>
 import NProgress from "nprogress";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 export default {
   metaInfo: {
@@ -60,7 +93,9 @@ export default {
       search: "",
       totalRows: "",
       reports: [],
-      report: {}
+      report: {},
+      warehouses: [],
+      warehouse_id: ""
     };
   },
 
@@ -87,20 +122,7 @@ export default {
           thClass: "text-left",
           sortable: false
         },
-        {
-          label: this.$t("Cost"),
-          field: "cost",
-          type: "decimal",
-          tdClass: "text-left",
-          thClass: "text-left"
-        },
-        {
-          label: this.$t("Price"),
-          field: "price",
-          type: "decimal",
-          tdClass: "text-left",
-          thClass: "text-left"
-        },
+      
         {
           label: this.$t("Current_stock"),
           field: "quantity",
@@ -120,6 +142,23 @@ export default {
   },
 
   methods: {
+
+     //----------------------------------- Sales PDF ------------------------------\\
+    stock_report_PDF() {
+      var self = this;
+
+      let pdf = new jsPDF("p", "pt");
+      let columns = [
+        { title: "Code", dataKey: "code" },
+        { title: "name", dataKey: "name" },
+        { title: "category", dataKey: "category" },
+        { title: "quantity", dataKey: "quantity" },
+      ];
+      pdf.autoTable(columns, self.reports);
+      pdf.text("Stock report", 40, 25);
+      pdf.save("Stock_report.pdf");
+    },
+
     //---- update Params Table
     updateParams(newProps) {
       this.serverParams = Object.assign({}, this.serverParams, newProps);
@@ -174,6 +213,14 @@ export default {
       return `${value[0]}.${formated}`;
     },
 
+     //---------------------- Event Select Warehouse ------------------------------\\
+    Selected_Warehouse(value) {
+      if (value === null) {
+        this.warehouse_id = "";
+      }
+      this.Get_Stock_Report(1);
+    },
+
     //--------------------------- Get Customer Report -------------\\
 
     Get_Stock_Report(page) {
@@ -188,6 +235,8 @@ export default {
             this.serverParams.sort.field +
             "&SortType=" +
             this.serverParams.sort.type +
+            "&warehouse_id=" +
+            this.warehouse_id +
             "&search=" +
             this.search +
             "&limit=" +
@@ -196,6 +245,7 @@ export default {
         .then(response => {
           this.reports = response.data.report;
           this.totalRows = response.data.totalRows;
+          this.warehouses = response.data.warehouses;
           // Complete the animation of theprogress bar.
           NProgress.done();
           this.isLoading = false;

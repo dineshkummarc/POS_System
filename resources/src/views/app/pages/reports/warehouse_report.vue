@@ -246,6 +246,13 @@
                       <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>
                     </router-link>
                   </div>
+                  <div v-else-if="props.column.field == 'sale_ref' && props.row.sale_id">
+                  <router-link
+                    :to="'/app/sales/detail/'+props.row.sale_id"
+                  >
+                    <span class="ul-btn__text ml-1">{{props.row.sale_ref}}</span>
+                  </router-link>
+                </div>
                 </template>
               </vue-good-table>
             </b-tab>
@@ -302,6 +309,13 @@
                       :to="'/app/purchase_return/detail/'+props.row.id"
                     >
                       <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>
+                    </router-link>
+                  </div>
+                   <div v-else-if="props.column.field == 'purchase_ref' && props.row.purchase_id">
+                    <router-link
+                      :to="'/app/purchases/detail/'+props.row.purchase_id"
+                    >
+                      <span class="ul-btn__text ml-1">{{props.row.purchase_ref}}</span>
                     </router-link>
                   </div>
                 </template>
@@ -560,6 +574,12 @@ export default {
           sortable: false
         },
         {
+          label: this.$t("Sale_Ref"),
+          field: "sale_ref",
+          tdClass: "text-left",
+          thClass: "text-left"
+        },
+        {
           label: this.$t("warehouse"),
           field: "warehouse_name",
           tdClass: "text-left",
@@ -627,6 +647,12 @@ export default {
         {
           label: this.$t("warehouse"),
           field: "warehouse_name",
+          tdClass: "text-left",
+          thClass: "text-left"
+        },
+        {
+          label: this.$t("Purchase_Ref"),
+          field: "purchase_ref",
           tdClass: "text-left",
           thClass: "text-left"
         },
@@ -749,6 +775,7 @@ export default {
         { title: "Ref", dataKey: "Ref" },
         { title: "Supplier", dataKey: "provider_name" },
         { title: "Warehouse", dataKey: "warehouse_name" },
+        { title: "Purchase", dataKey: "purchase_ref" },
         { title: "Total", dataKey: "GrandTotal" },
         { title: "Paid", dataKey: "paid_amount" },
         { title: "Due", dataKey: "due" },
@@ -768,6 +795,7 @@ export default {
       let columns = [
         { title: "Ref", dataKey: "Ref" },
         { title: "Client", dataKey: "client_name" },
+        { title: "sale_ref", dataKey: "sale_ref" },
         { title: "Warehouse", dataKey: "warehouse_name" },
         { title: "Total", dataKey: "GrandTotal" },
         { title: "Paid", dataKey: "paid_amount" },
@@ -853,7 +881,7 @@ export default {
     //------------------------------ Show Reports -------------------------\\
     Get_Reports() {
       axios
-        .get("report/Warehouse_Report?warehouse_id=" + this.Filter_warehouse)
+        .get("report/warehouse_report?warehouse_id=" + this.Filter_warehouse)
         .then(response => {
           this.total = response.data.data;
           this.warehouses = response.data.warehouses;
@@ -885,7 +913,7 @@ export default {
     Get_Sales(page) {
       axios
         .get(
-          "report/Sales_Warehouse?page=" +
+          "report/sales_warehouse?page=" +
             page +
             "&limit=" +
             this.limit_sales +
@@ -932,7 +960,7 @@ export default {
     Get_Quotations(page) {
       axios
         .get(
-          "report/Quotations_Warehouse?page=" +
+          "report/quotations_warehouse?page=" +
             page +
             "&limit=" +
             this.limit_quotations +
@@ -972,7 +1000,7 @@ export default {
     Get_Returns_Sale(page) {
       axios
         .get(
-          "report/Returns_Sale_Warehouse?page=" +
+          "report/returns_sale_warehouse?page=" +
             page +
             "&limit=" +
             this.limit_returns_Sale +
@@ -1012,7 +1040,7 @@ export default {
     Get_Returns_Purchase(page) {
       axios
         .get(
-          "report/Returns_Purchase_Warehouse?page=" +
+          "report/returns_purchase_warehouse?page=" +
             page +
             "&limit=" +
             this.limit_returns_Purchase +
@@ -1052,7 +1080,7 @@ export default {
     Get_Expenses(page) {
       axios
         .get(
-          "report/Expenses_Warehouse?page=" +
+          "report/expenses_warehouse?page=" +
             page +
             "&limit=" +
             this.limit_expenses +
@@ -1071,7 +1099,7 @@ export default {
     //---------------------------------- Report Warhouse Count Stock
     report_with_echart() {
       axios
-        .get(`report/Warhouse_Count_Stock`)
+        .get(`report/warhouse_count_stock`)
         .then(response => {
           const responseData = response.data;
           var dark_heading = "#c2c6dc";

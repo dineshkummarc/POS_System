@@ -76,7 +76,6 @@ class PermissionsController extends BaseController
                 $permissions = $request->permissions;
 
                 foreach ($permissions as $permission_slug) {
-                    //get the permission object by name
                     $perm = Permission::firstOrCreate(['name' => $permission_slug]);
                     $data[] = $perm->id;
                 }
@@ -175,11 +174,6 @@ class PermissionsController extends BaseController
         return response()->json(['success' => true]);
     }
 
-    //----------- Check Create Page --------------\\
-    public function Check_Create_Page(Request $request)
-    {
-        $this->authorizeForUser($request->user('api'), 'create', Role::class);
-    }
 
     //----------- GET ALL Roles without paginate --------------\\
 
@@ -196,21 +190,28 @@ class PermissionsController extends BaseController
 
         $this->authorizeForUser($request->user('api'), 'update', Role::class);
 
-        $Role = Role::with('permissions')->where('deleted_at', '=', null)->findOrFail($id);
-        if ($Role) {
-            $item['name'] = $Role->name;
-            $item['description'] = $Role->description;
-            $data = [];
+        if($id != '1'){
+            $Role = Role::with('permissions')->where('deleted_at', '=', null)->findOrFail($id);
             if ($Role) {
-                foreach ($Role->permissions as $permission) {
-                    $data[] = $permission->name;
+                $item['name'] = $Role->name;
+                $item['description'] = $Role->description;
+                $data = [];
+                if ($Role) {
+                    foreach ($Role->permissions as $permission) {
+                        $data[] = $permission->name;
+                    }
                 }
             }
+            return response()->json([
+                'permissions' => $data,
+                'role' => $item,
+            ]);
+            
+        }else{
+            return response()->json([
+                'success' => false,
+            ], 401);
         }
-        return response()->json([
-            'permissions' => $data,
-            'role' => $item,
-        ]);
     }
 
 }

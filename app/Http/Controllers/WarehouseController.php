@@ -67,23 +67,21 @@ class WarehouseController extends Controller
 
         \DB::transaction(function () use ($request) {
 
-            $Warehouse = new Warehouse;
-            $Warehouse->name = $request['name'];
-            $Warehouse->mobile = $request['mobile'];
+            $Warehouse          = new Warehouse;
+            $Warehouse->name    = $request['name'];
+            $Warehouse->mobile  = $request['mobile'];
             $Warehouse->country = $request['country'];
-            $Warehouse->city = $request['city'];
-            $Warehouse->zip = $request['zip'];
-            $Warehouse->email = $request['email'];
+            $Warehouse->city    = $request['city'];
+            $Warehouse->zip     = $request['zip'];
+            $Warehouse->email   = $request['email'];
             $Warehouse->save();
 
-            $products = Product::where('deleted_at', '=', null)
-                ->pluck('id')
-                ->toArray();
+            $products = Product::where('deleted_at', '=', null)->get(['id','type']);
 
             if ($products) {
                 foreach ($products as $product) {
                     $product_warehouse = [];
-                    $Product_Variants = ProductVariant::where('product_id', $product)
+                    $Product_Variants = ProductVariant::where('product_id', $product->id)
                         ->where('deleted_at', null)
                         ->get();
 
@@ -91,16 +89,18 @@ class WarehouseController extends Controller
                         foreach ($Product_Variants as $product_variant) {
 
                             $product_warehouse[] = [
-                                'product_id' => $product,
-                                'warehouse_id' => $Warehouse->id,
+                                'product_id'         => $product->id,
+                                'warehouse_id'       => $Warehouse->id,
                                 'product_variant_id' => $product_variant->id,
+                                'manage_stock'       => $product->type == 'is_service'?0:1,
                             ];
                         }
                     } else {
                         $product_warehouse[] = [
-                            'product_id' => $product,
-                            'warehouse_id' => $Warehouse->id,
+                            'product_id'         => $product->id,
+                            'warehouse_id'       => $Warehouse->id,
                             'product_variant_id' => null,
+                            'manage_stock'       => $product->type == 'is_service'?0:1,
                         ];
                     }
 

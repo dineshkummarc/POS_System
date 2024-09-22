@@ -170,6 +170,13 @@
                       <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>
                     </router-link>
                   </div>
+                  <div v-else-if="props.column.field == 'purchase_ref' && props.row.purchase_id">
+                    <router-link
+                      :to="'/app/purchases/detail/'+props.row.purchase_id"
+                    >
+                      <span class="ul-btn__text ml-1">{{props.row.purchase_ref}}</span>
+                    </router-link>
+                  </div>
                 </template>
               </vue-good-table>
             </b-tab>
@@ -336,6 +343,12 @@ export default {
           tdClass: "text-left",
           thClass: "text-left"
         },
+        {
+          label: this.$t("Purchase_Ref"),
+          field: "purchase_ref",
+          tdClass: "text-left",
+          thClass: "text-left"
+        },
        
         {
           label: this.$t("Total"),
@@ -452,6 +465,7 @@ export default {
         { title: "Ref", dataKey: "Ref" },
         { title: "Supplier", dataKey: "provider_name" },
         { title: "Warehouse", dataKey: "warehouse_name" },
+        { title: "Purchase", dataKey: "purchase_ref" },
         { title: "Total", dataKey: "GrandTotal" },
         { title: "Paid", dataKey: "paid_amount" },
         { title: "Due", dataKey: "due" },

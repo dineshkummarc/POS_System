@@ -47,74 +47,86 @@
                       ref="myData"
                       class="dropdown-menu-left rtl-ps-none notification-dropdown ps scroll"
                     >
-                      <div class="menu-icon-grid">
-                        <a @click="SetLocal('en')">
-                          <i title="en" class="flag-icon flag-icon-squared flag-icon-gb"></i> English
-                        </a>
-                        <a @click="SetLocal('fr')">
-                          <i title="fr" class="flag-icon flag-icon-squared flag-icon-fr"></i>
-                          <span class="title-lang">French</span>
-                        </a>
-                        <a @click="SetLocal('ar')">
-                          <i title="sa" class="flag-icon flag-icon-squared flag-icon-sa"></i>
-                          <span class="title-lang">Arabic</span>
-                        </a>
-                        <a @click="SetLocal('tur')">
-                          <i title="sa" class="flag-icon flag-icon-squared flag-icon-tr"></i>
-                          <span class="title-lang">Turkish</span>
-                        </a>
+                     <div class="menu-icon-grid">
+              <a @click="SetLocal('en')">
+                <i title="en" class="flag-icon flag-icon-squared flag-icon-gb"></i> English
+              </a>
+              <a @click="SetLocal('fr')">
+                <i title="fr" class="flag-icon flag-icon-squared flag-icon-fr"></i>
+                <span class="title-lang">French</span>
+              </a>
+              <a @click="SetLocal('ar')">
+                <i title="sa" class="flag-icon flag-icon-squared flag-icon-sa"></i>
+                <span class="title-lang">Arabic</span>
+              </a>
+              <a @click="SetLocal('tur')">
+                <i title="sa" class="flag-icon flag-icon-squared flag-icon-tr"></i>
+                <span class="title-lang">Turkish</span>
+              </a>
 
-                        <a @click="SetLocal('sm_ch')">
-                          <i title="sa" class="flag-icon flag-icon-squared flag-icon-cn"></i>
-                          <span class="title-lang">Simplified Chinese</span>
-                        </a>
+              <a @click="SetLocal('sm_ch')">
+                <i title="sa" class="flag-icon flag-icon-squared flag-icon-cn"></i>
+                <span class="title-lang">Simplified Chinese</span>
+              </a>
 
-                        <a @click="SetLocal('thai')">
-                          <i title="sa" class="flag-icon flag-icon-squared flag-icon-tw"></i>
-                          <span class="title-lang">Thaï</span>
-                        </a>
+              <a @click="SetLocal('thai')">
+                <i title="sa" class="flag-icon flag-icon-squared flag-icon-th"></i>
+                <span class="title-lang">Thaï</span>
+              </a>
 
-                        <a @click="SetLocal('hn')">
-                          <i title="sa" class="flag-icon flag-icon-squared flag-icon-in"></i>
-                          <span class="title-lang">Hindi</span>
-                        </a>
+              <a @click="SetLocal('hn')">
+                <i title="sa" class="flag-icon flag-icon-squared flag-icon-in"></i>
+                <span class="title-lang">Hindi</span>
+              </a>
 
-                        <a @click="SetLocal('de')">
-                          <i title="de" class="flag-icon flag-icon-squared flag-icon-de"></i>
-                          <span class="title-lang">German</span>
-                        </a>
-                        <a @click="SetLocal('es')">
-                          <i title="es" class="flag-icon flag-icon-squared flag-icon-es"></i>
-                          <span class="title-lang">Spanish</span>
-                        </a>
-                        <a @click="SetLocal('it')">
-                          <i title="it" class="flag-icon flag-icon-squared flag-icon-it"></i>
-                          <span class="title-lang">Italien</span>
-                        </a>
-                        <a @click="SetLocal('Ind')">
-                          <i title="sa" class="flag-icon flag-icon-squared flag-icon-id"></i>
-                          <span class="title-lang">Indonesian</span>
-                        </a>
+              <a @click="SetLocal('de')">
+                <i title="de" class="flag-icon flag-icon-squared flag-icon-de"></i>
+                <span class="title-lang">German</span>
+              </a>
+              <a @click="SetLocal('es')">
+                <i title="es" class="flag-icon flag-icon-squared flag-icon-es"></i>
+                <span class="title-lang">Spanish</span>
+              </a>
+              <a @click="SetLocal('it')">
+                <i title="it" class="flag-icon flag-icon-squared flag-icon-it"></i>
+                <span class="title-lang">Italien</span>
+              </a>
+              <a @click="SetLocal('Ind')">
+                <i title="sa" class="flag-icon flag-icon-squared flag-icon-id"></i>
+                <span class="title-lang">Indonesian</span>
+              </a>
 
-                        <a @click="SetLocal('tr_ch')">
-                          <i title="sa" class="flag-icon flag-icon-squared flag-icon-cn"></i>
-                          <span class="title-lang">Traditional Chinese</span>
-                        </a>
+              <a @click="SetLocal('tr_ch')">
+                <i title="sa" class="flag-icon flag-icon-squared flag-icon-cn"></i>
+                <span class="title-lang">Traditional Chinese</span>
+              </a>
 
-                        <a @click="SetLocal('ru')">
-                          <i title="sa" class="flag-icon flag-icon-squared flag-icon-ru"></i>
-                          <span class="title-lang">Russian</span>
-                        </a>
+              <a @click="SetLocal('ru')">
+                <i title="sa" class="flag-icon flag-icon-squared flag-icon-ru"></i>
+                <span class="title-lang">Russian</span>
+              </a>
 
-                        <a @click="SetLocal('vn')">
-                          <i title="sa" class="flag-icon flag-icon-squared flag-icon-vn"></i>
-                          <span class="title-lang">Vietnamese</span>
-                        </a>
-                        <a @click="SetLocal('kr')">
-                          <i title="sa" class="flag-icon flag-icon-squared flag-icon-kr"></i>
-                          <span class="title-lang">Korean</span>
-                        </a>
-                      </div>
+              <a @click="SetLocal('vn')">
+                <i title="sa" class="flag-icon flag-icon-squared flag-icon-vn"></i>
+                <span class="title-lang">Vietnamese</span>
+              </a>
+
+              <a @click="SetLocal('kr')">
+                <i title="sa" class="flag-icon flag-icon-squared flag-icon-kr"></i>
+                <span class="title-lang">Korean</span>
+              </a>
+             
+              <a @click="SetLocal('ba')">
+                <i title="sa" class="flag-icon flag-icon-squared flag-icon-bd"></i>
+                <span class="title-lang">Bangla</span>
+              </a>
+
+              <a @click="SetLocal('br')">
+                <i title="pt" class="flag-icon flag-icon-squared flag-icon-pt"></i>
+                <span class="title-lang">Portuguese</span>
+              </a>
+
+            </div>
                     </vue-perfect-scrollbar>
                   </b-dropdown>
                 </div>
@@ -170,6 +182,7 @@
                             :class="{'is-invalid': !!errors.length}"
                             :state="errors[0] ? false : (valid ? true : null)"
                             v-model="sale.client_id"
+                            @input="onClientSelected"
                             :reduce="label => label.value"
                             :placeholder="$t('Choose_Customer')"
                             class="w-100"
@@ -229,7 +242,8 @@
                                   <span>{{detail.code}}</span>
                                   <br>
                                   <span class="badge badge-success">{{detail.name}}</span>
-                                  <i @click="Modal_Updat_Detail(detail)" class="i-Edit"></i>
+                                  <i v-if="currentUserPermissions && currentUserPermissions.includes('edit_product_sale')" 
+                                    @click="Modal_Updat_Detail(detail)" class="i-Edit text-success cursor-pointer"></i>
                                 </td>
                                 <td>{{currentUser.currency}} {{formatNumber(detail.Total_price, 2)}}</td>
                                 <td>
@@ -263,7 +277,7 @@
                                     @click="delete_Product_Detail(detail.detail_id)"
                                     title="Delete"
                                   >
-                                    <i class="i-Close-Window text-25 text-danger"></i>
+                                    <i class="i-Close-Window text-25 text-danger cursor-pointer"></i>
                                   </a>
                                 </td>
                               </tr>
@@ -279,12 +293,12 @@
                     <b-row>
                       <b-col md="12">
                         <div class="grandtotal">
-                          <span>{{$t("Total")}} : {{currentUser.currency}} {{GrandTotal.toFixed(2)}}</span>
+                          <span>{{$t("Total_Payable")}} : {{currentUser.currency}} {{GrandTotal.toFixed(2)}}</span>
                         </div>
                       </b-col>
 
                       <!-- Order Tax  -->
-                      <b-col lg="4" md="4" sm="12">
+                      <b-col lg="4" md="4" sm="12" v-if="currentUserPermissions && currentUserPermissions.includes('edit_tax_discount_shipping_sale')">
                         <validation-provider
                           name="Order Tax"
                           :rules="{ regex: /^\d*\.?\d*$/}"
@@ -308,7 +322,7 @@
                       </b-col>
 
                       <!-- Discount -->
-                      <b-col lg="4" md="4" sm="12">
+                      <b-col lg="4" md="4" sm="12" v-if="currentUserPermissions && currentUserPermissions.includes('edit_tax_discount_shipping_sale')">
                         <validation-provider
                           name="Discount"
                           :rules="{ regex: /^\d*\.?\d*$/}"
@@ -332,7 +346,7 @@
                       </b-col>
 
                       <!-- Shipping  -->
-                      <b-col lg="4" md="4" sm="12">
+                      <b-col lg="4" md="4" sm="12" v-if="currentUserPermissions && currentUserPermissions.includes('edit_tax_discount_shipping_sale')">
                         <validation-provider
                           name="Shipping"
                           :rules="{ regex: /^\d*\.?\d*$/}"
@@ -366,7 +380,7 @@
                         </b-button>
                       </b-col>
                       <b-col md="6" sm="12">
-                        <b-button type="submit" variant="primary ripple mt-1 btn-rounded btn-block">
+                        <b-button type="submit" variant="success ripple mt-1 btn-rounded btn-block">
                           <i class="i-Checkout"></i>
                           {{ $t("payNow") }}
                         </b-button>
@@ -490,7 +504,7 @@
                     </b-col>
 
                     <!-- Unit Sale -->
-                   <b-col lg="6" md="6" sm="12">
+                   <b-col lg="6" md="6" sm="12" v-if="detail.product_type != 'is_service'">
                       <validation-provider name="Unit Sale" :rules="{ required: true}">
                         <b-form-group slot-scope="{ valid, errors }" :label="$t('UnitSale') + ' ' + '*'">
                           <v-select
@@ -584,7 +598,8 @@
                       <span
                         class="badge badge-primary w-15 w-sm-100 mb-2"
                       >{{currentUser.currency}} {{formatNumber(product.Net_price , 2)}}</span>
-                      <p
+
+                      <p v-if="product.product_type != 'is_service'"
                         class="m-0 text-muted text-small w-15 w-sm-100 d-none d-lg-block item-badges"
                       >
                         <span
@@ -759,13 +774,16 @@
           <div id="invoice-POS">
             <div style="max-width:400px;margin:0px auto">
               <div class="info">
-                <h2 class="text-center">{{invoice_pos.setting.CompanyName}}</h2>
+                <div class="invoice_logo text-center mb-2">
+                  <img :src="'/images/'+invoice_pos.setting.logo" alt width="60" height="60">
+                </div>
                 <p>
                   <span>{{$t('date')}} : {{invoice_pos.sale.date}} <br></span>
                   <span v-show="pos_settings.show_address">{{$t('Adress')}} : {{invoice_pos.setting.CompanyAdress}} <br></span>
                   <span v-show="pos_settings.show_email">{{$t('Email')}} : {{invoice_pos.setting.email}} <br></span>
                   <span v-show="pos_settings.show_phone">{{$t('Phone')}} : {{invoice_pos.setting.CompanyPhone}} <br></span>
                   <span v-show="pos_settings.show_customer">{{$t('Customer')}} : {{invoice_pos.sale.client_name}} <br></span>
+                  <span v-show="pos_settings.show_Warehouse">{{$t('warehouse')}} : {{invoice_pos.sale.warehouse_name}} <br></span>
                 </p>
               </div>
 
@@ -792,6 +810,11 @@
                   <tr style="margin-top:10px" v-show="pos_settings.show_discount">
                     <td colspan="3" class="total">{{$t('Discount')}}</td>
                     <td style="text-align:right;" class="total">{{invoice_pos.symbol}} {{formatNumber(invoice_pos.sale.discount ,2)}}</td>
+                  </tr>
+
+                  <tr style="margin-top:10px" v-show="pos_settings.show_discount">
+                    <td colspan="3" class="total">{{$t('Shipping')}}</td>
+                    <td style="text-align:right;" class="total">{{invoice_pos.symbol}} {{formatNumber(invoice_pos.sale.shipping ,2)}}</td>
                   </tr>
 
                   <tr style="margin-top:10px">
@@ -877,6 +900,7 @@
         <validation-observer ref="Add_payment">
           <b-modal hide-footer size="lg" id="Add_Payment" :title="$t('AddPayment')">
             <b-form @submit.prevent="Submit_Payment">
+              <h1 class="text-center mt-3 mb-3">{{client_name}}</h1>
               <b-row>
                 <b-col md="6">
                   <b-row>
@@ -934,49 +958,145 @@
                       >{{parseFloat(payment.received_amount - payment.amount).toFixed(2)}}</p>
                     </b-col>
 
-                    <!-- Payment choice -->
-                    <b-col lg="12" md="12" sm="12">
-                      <validation-provider name="Payment choice" :rules="{ required: true}">
-                        <b-form-group slot-scope="{ valid, errors }" :label="$t('Paymentchoice') + ' ' + '*'">
-                          <v-select
-                            :class="{'is-invalid': !!errors.length}"
-                            :state="errors[0] ? false : (valid ? true : null)"
-                            v-model="payment.Reglement"
-                            @input="Selected_PaymentMethod"
-                            :reduce="label => label.value"
-                            :placeholder="$t('PleaseSelect')"
-                            :options="
-                              [
-                              {label: 'Cash', value: 'Cash'},
-                              {label: 'credit card', value: 'credit card'},
-                              {label: 'cheque', value: 'cheque'},
-                              {label: 'Western Union', value: 'Western Union'},
-                              {label: 'bank transfer', value: 'bank transfer'},
-                              {label: 'other', value: 'other'},
-                              ]"
-                          ></v-select>
-                          <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
-                        </b-form-group>
-                      </validation-provider>
-                    </b-col>
+                    
+                  </b-row>
+                </b-col>
+                 <b-col md="6">
+                    <b-card>
+                      <b-list-group>
+                        <b-list-group-item class="d-flex justify-content-between align-items-center">
+                          {{$t('TotalProducts')}}
+                          <b-badge variant="primary" pill>{{details.length}}</b-badge>
+                        </b-list-group-item>
 
-                    <b-col md="12" v-if="payment.Reglement == 'credit card'">
-                      <form id="payment-form">
-                        <label
-                          for="card-element"
-                          class="leading-7 text-sm text-gray-600"
-                        >{{$t('Credit_Card_Info')}}</label>
-                        <div id="card-element">
-                          <!-- Elements will create input elements here -->
+                        <b-list-group-item class="d-flex justify-content-between align-items-center">
+                          {{$t('OrderTax')}}
+                          <span
+                            class="font-weight-bold"
+                          >{{currentUser.currency}} {{sale.TaxNet.toFixed(2)}} ({{sale.tax_rate}} %)</span>
+                        </b-list-group-item>
+                        <b-list-group-item class="d-flex justify-content-between align-items-center">
+                          {{$t('Discount')}}
+                          <span
+                            class="font-weight-bold"
+                          >{{currentUser.currency}} {{sale.discount.toFixed(2)}}</span>
+                        </b-list-group-item>
+
+                        <b-list-group-item class="d-flex justify-content-between align-items-center">
+                          {{$t('Shipping')}}
+                          <span
+                            class="font-weight-bold"
+                          >{{currentUser.currency}} {{sale.shipping.toFixed(2)}}</span>
+                        </b-list-group-item>
+
+                        <b-list-group-item class="d-flex justify-content-between align-items-center">
+                          {{$t('Total_Payable')}}
+                          <span
+                            class="font-weight-bold"
+                          >{{currentUser.currency}} {{GrandTotal.toFixed(2)}}</span>
+                        </b-list-group-item>
+                      </b-list-group>
+                    </b-card>
+                </b-col>
+              </b-row>
+              <b-row class="mt-4">
+               
+                  <!-- Payment choice -->
+                  <b-col lg="6" md="6" sm="12">
+                    <validation-provider name="Payment choice" :rules="{ required: true}">
+                      <b-form-group slot-scope="{ valid, errors }" :label="$t('Paymentchoice') + ' ' + '*'">
+                        <v-select
+                          :class="{'is-invalid': !!errors.length}"
+                          :state="errors[0] ? false : (valid ? true : null)"
+                          v-model="payment.Reglement"
+                          @input="Selected_PaymentMethod"
+                          :reduce="label => label.value"
+                          :placeholder="$t('PleaseSelect')"
+                          :options="
+                            [
+                            {label: 'Cash', value: 'Cash'},
+                            {label: 'credit card', value: 'credit card'},
+                            {label: 'TPE', value: 'tpe'},
+                            {label: 'cheque', value: 'cheque'},
+                            {label: 'Western Union', value: 'Western Union'},
+                            {label: 'bank transfer', value: 'bank transfer'},
+                            {label: 'other', value: 'other'},
+                            ]"
+                        ></v-select>
+                        <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
+                      </b-form-group>
+                    </validation-provider>
+                  </b-col>
+
+                  <b-col md="12">
+                     <b-card v-show="payment.Reglement == 'credit card'">
+                        <div v-once class="typo__p" v-if="submit_showing_credit_card">
+                          <div class="spinner sm spinner-primary mt-3"></div>
                         </div>
-                        <!-- We'll put the error messages in this element -->
-                        <div id="card-errors" class="is-invalid" role="alert"></div>
-                      </form>
-                    </b-col>
+                        <div v-if="displaySavedPaymentMethods && !submit_showing_credit_card">
+                          <div class="mt-3"><span class="mr-3">Saved Credit Card Info For This Client </span>
+                          <b-button variant="outline-info" @click="show_new_credit_card()">
+                              <span>
+                                <i class="i-Two-Windows"></i>
+                                New Credit Card
+                              </span>
+                          </b-button>
 
-                    <!-- Note -->
-                    <b-col lg="12" md="12" sm="12" class="mt-2">
-                      <b-form-group :label="$t('Note')">
+                          </div>
+                          <table class="table table-hover mt-3">
+                            <thead>
+                              <tr>
+                                <th>Last 4 digits</th>
+                                <th>Type</th>
+                                <th>Exp</th>
+                                <th>Action</th>
+
+                              </tr>
+                            </thead>
+
+                            <tbody>
+                              <tr v-for="card in savedPaymentMethods" :class="{ 'bg-selected-card': isSelectedCard(card) }">
+                                <td>**** {{card.last4}}</td>
+                                <td>{{card.type}}</td>
+                                <td>{{card.exp}}</td>
+                                <td>
+                                   <b-button variant="outline-primary" @click="selectCard(card)" v-if="!isSelectedCard(card) && card_id != card.card_id">
+                                      <span>
+                                        <i class="i-Drag-Up"></i> 
+                                        Use This
+                                      </span>
+                                    </b-button>
+                                     <i v-if="isSelectedCard(card) || card_id == card.card_id" class="i-Yes" style=" font-size: 20px; "></i> 
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+
+                        <div v-if="displayFormNewCard && !submit_showing_credit_card">
+                          <form id="payment-form">
+                            <label for="card-element" class="leading-7 text-sm text-gray-600">
+                              {{$t('Credit_Card_Info')}}
+                              <b-button variant="outline-info" @click="show_saved_credit_card()" v-if="savedPaymentMethods && savedPaymentMethods.length > 0">
+                                <span>
+                                      <i class="i-Two-Windows"></i>
+                                      Use Saved Credit Card
+                                    </span>
+                                </b-button>
+                              </label>
+                            <div id="card-element">
+                            </div>
+                            <div id="card-errors" class="is-invalid" role="alert"></div>
+                          </form>
+                        </div>
+                     </b-card>
+                  </b-col>
+               
+
+
+                    <!-- payment Note -->
+                    <b-col lg="6" md="6" sm="12" class="mt-2">
+                      <b-form-group :label="$t('Payment_note')">
                         <b-form-textarea
                           id="textarea"
                           v-model="payment.notes"
@@ -985,53 +1105,27 @@
                         ></b-form-textarea>
                       </b-form-group>
                     </b-col>
-                  </b-row>
-                </b-col>
 
-                <b-col md="6">
-                  <b-card>
-                    <b-list-group>
-                      <b-list-group-item class="d-flex justify-content-between align-items-center">
-                        {{$t('TotalProducts')}}
-                        <b-badge variant="primary" pill>{{details.length}}</b-badge>
-                      </b-list-group-item>
+                    <!-- sale Note -->
+                    <b-col lg="6" md="6" sm="12" class="mt-2">
+                      <b-form-group :label="$t('sale_note')">
+                        <b-form-textarea
+                          id="textarea"
+                          v-model="sale.notes"
+                          rows="3"
+                          max-rows="6"
+                        ></b-form-textarea>
+                      </b-form-group>
+                    </b-col>
 
-                      <b-list-group-item class="d-flex justify-content-between align-items-center">
-                        {{$t('OrderTax')}}
-                        <span
-                          class="font-weight-bold"
-                        >{{currentUser.currency}} {{sale.TaxNet.toFixed(2)}} ({{sale.tax_rate}} %)</span>
-                      </b-list-group-item>
-                      <b-list-group-item class="d-flex justify-content-between align-items-center">
-                        {{$t('Discount')}}
-                        <span
-                          class="font-weight-bold"
-                        >{{currentUser.currency}} {{sale.discount.toFixed(2)}}</span>
-                      </b-list-group-item>
 
-                      <b-list-group-item class="d-flex justify-content-between align-items-center">
-                        {{$t('Shipping')}}
-                        <span
-                          class="font-weight-bold"
-                        >{{currentUser.currency}} {{sale.shipping.toFixed(2)}}</span>
-                      </b-list-group-item>
-
-                      <b-list-group-item class="d-flex justify-content-between align-items-center">
-                        {{$t('Total')}}
-                        <span
-                          class="font-weight-bold"
-                        >{{currentUser.currency}} {{GrandTotal.toFixed(2)}}</span>
-                      </b-list-group-item>
-                    </b-list-group>
-                  </b-card>
-                </b-col>
 
                 <b-col md="12" class="mt-3">
                   <b-button
                     variant="primary"
                     type="submit"
                     :disabled="paymentProcessing"
-                  >{{$t('submit')}}</b-button>
+                  ><i class="i-Yes me-2 font-weight-bold"></i> {{$t('submit')}}</b-button>
                   <div v-once class="typo__p" v-if="paymentProcessing">
                     <div class="spinner sm spinner-primary mt-3"></div>
                   </div>
@@ -1067,22 +1161,13 @@
 
                 <!-- Customer Email -->
                 <b-col md="6" sm="12">
-                  <validation-provider
-                    name="Email customer"
-                    :rules="{ required: true}"
-                    v-slot="validationContext"
-                  >
-                    <b-form-group :label="$t('Email') + ' ' + '*'">
+                    <b-form-group :label="$t('Email')">
                       <b-form-input
-                        :state="getValidationState(validationContext)"
-                        aria-describedby="Email-feedback"
-                        label="Email"
+                        label="email"
                         v-model="client.email"
-                         :placeholder="$t('Email')"
+                        :placeholder="$t('Email')"
                       ></b-form-input>
-                      <b-form-invalid-feedback id="Email-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                     </b-form-group>
-                  </validation-provider>
                 </b-col>
 
                 <!-- Customer Phone -->
@@ -1118,19 +1203,33 @@
                     </b-form-group>
                 </b-col>
 
-                <!-- Customer Adress -->
+                 <!-- Customer Tax Number -->
                 <b-col md="6" sm="12">
-                    <b-form-group :label="$t('Adress')">
+                    <b-form-group :label="$t('Tax_Number')">
                       <b-form-input
-                        label="Adress"
-                        v-model="client.adresse"
-                         :placeholder="$t('Adress')"
+                        label="Tax Number"
+                        v-model="client.tax_number"
+                        :placeholder="$t('Tax_Number')"
                       ></b-form-input>
                     </b-form-group>
                 </b-col>
 
+
+                  <!-- Customer Adress -->
+                <b-col md="12" sm="12">
+                    <b-form-group :label="$t('Adress')">
+                      <textarea
+                        label="Adress"
+                        class="form-control"
+                        rows="4"
+                        v-model="client.adresse"
+                        :placeholder="$t('Adress')"
+                    ></textarea>
+                    </b-form-group>
+                </b-col>
+
                 <b-col md="12" class="mt-3">
-                  <b-button variant="primary" type="submit">{{$t('submit')}}</b-button>
+                  <b-button variant="primary" type="submit"><i class="i-Yes me-2 font-weight-bold"></i> {{$t('submit')}}</b-button>
                 </b-col>
               </b-row>
             </b-form>
@@ -1149,7 +1248,6 @@ import VueBarcode from "vue-barcode";
 import FlagIcon from "vue-flag-icon";
 import Util from "./../../../utils";
 import { loadStripe } from "@stripe/stripe-js";
-
 export default {
   components: {
     vueEasyPrint,
@@ -1177,11 +1275,23 @@ export default {
         "hn",
         "vn",
         "kr",
+        "ba",
+        "br",
       ],
       stripe: {},
       stripe_key: "",
       cardElement: {},
       paymentProcessing: false,
+
+      savedPaymentMethods: [],
+      hasSavedPaymentMethod: false,
+      useSavedPaymentMethod: false,
+      selectedCard:null,
+      card_id:'',
+      is_new_credit_card: false,
+      submit_showing_credit_card: false,
+
+      client_name:'',
       payment: {
         amount: "",
         received_amount: "",
@@ -1193,6 +1303,7 @@ export default {
       search_input:'',
       product_filter:[],
       isLoading: true,
+      load_product: true,
       GrandTotal: 0,
       total: 0,
       Ref: "",
@@ -1230,7 +1341,6 @@ export default {
           GrandTotal: "",
           paid_amount: ""
         },
-        
         details: [],
         setting: {
           logo: "",
@@ -1240,14 +1350,14 @@ export default {
           CompanyPhone: ""
         }
       },
-
       sale: {
         warehouse_id: "",
         client_id: "",
         tax_rate: 0,
         shipping: 0,
         discount: 0,
-        TaxNet: 0
+        TaxNet: 0,
+        notes:'',
       },
       client: {
         id: "",
@@ -1256,6 +1366,7 @@ export default {
         email: "",
         phone: "",
         country: "",
+        tax_number: "",
         city: "",
         adresse: ""
       },
@@ -1264,6 +1375,7 @@ export default {
       product: {
         id: "",
         code: "",
+        product_type: "",
         current: "",
         quantity: "",
         check_qty: "",
@@ -1292,80 +1404,156 @@ export default {
       audio: new Audio("/audio/Beep.wav")
     };
   },
-
   computed: {
     ...mapGetters(["currentUser", "currentUserPermissions"]),
 
     brand_totalRows() {
       return this.brands.length;
     },
+
     category_totalRows() {
       return this.categories.length;
-    }
-  },
+    },
 
+    displaySavedPaymentMethods() {
+      if(this.hasSavedPaymentMethod){
+        return true;
+      }else{
+        return false;
+      }
+    },
+
+    displayFormNewCard() {
+      if(this.useSavedPaymentMethod){
+        return false;
+      }else{
+        return true;
+      }
+    },
+
+    isSelectedCard() {
+      return card => this.selectedCard === card;
+    },
+
+    
+
+  },
   mounted() {
     this.changeSidebarProperties();
     this.paginate_products(this.product_perPage, 0);
   },
-
   methods: {
     ...mapActions(["changeSidebarProperties", "changeThemeMode", "logout"]),
-    ...mapGetters(["currentUser"]),
+    // ...mapGetters(["currentUser"]),
     logoutUser() {
       this.$store.dispatch("logout");
+    },
+    
+     handleFocus() {
+      this.focused = true
+    },
+    handleBlur() {
+      this.focused = false
+    },
+
+
+
+    async Selected_PaymentMethod(value) {
+      if (value === 'credit card') {
+        this.savedPaymentMethods = [];
+        this.submit_showing_credit_card = true;
+        this.selectedCard = null
+        this.card_id = '';
+        // Check if the customer has saved payment methods
+        await axios.get(`/retrieve-customer?customerId=${this.sale.client_id}`)
+            .then(response => {
+                // If the customer has saved payment methods, display them
+                this.savedPaymentMethods = response.data.data;
+                this.card_id = response.data.customer_default_source;
+                this.hasSavedPaymentMethod = true;
+                this.useSavedPaymentMethod = true;
+                this.is_new_credit_card = false;
+                this.submit_showing_credit_card = false;
+            })
+            .catch(error => {
+                // If the customer does not have saved payment methods, show the card element for them to enter their payment information
+                this.hasSavedPaymentMethod = false;
+                this.useSavedPaymentMethod = false;
+                this.is_new_credit_card = true;
+                this.card_id = '';
+
+                setTimeout(() => {
+                    this.loadStripe_payment();
+                }, 1000);
+                this.submit_showing_credit_card = false;
+            });
+
+         
+        }else{
+          this.hasSavedPaymentMethod = false;
+          this.useSavedPaymentMethod = false;
+          this.is_new_credit_card = false;
+        }
+
+    },
+
+    show_saved_credit_card() {
+      this.hasSavedPaymentMethod = true;
+      this.useSavedPaymentMethod = true;
+      this.is_new_credit_card = false;
+      this.Selected_PaymentMethod('credit card');
+    },
+
+    show_new_credit_card() {
+      this.selectedCard = null;
+      this.card_id = '';
+      this.useSavedPaymentMethod = false;
+      this.hasSavedPaymentMethod = false;
+      this.is_new_credit_card = true;
+
+      setTimeout(() => {
+        this.loadStripe_payment();
+      }, 500);
+    },
+
+    selectCard(card) {
+      this.selectedCard = card;
+      this.card_id = card.card_id;
     },
 
     async loadStripe_payment() {
       this.stripe = await loadStripe(`${this.stripe_key}`);
       const elements = this.stripe.elements();
-
       this.cardElement = elements.create("card", {
         classes: {
           base:
             "bg-gray-100 rounded border border-gray-300 focus:border-indigo-500 text-base outline-none text-gray-700 p-3 leading-8 transition-colors duration-200 ease-in-out"
         }
       });
-
       this.cardElement.mount("#card-element");
     },
 
-     handleFocus() {
-      this.focused = true
-    },
 
-    handleBlur() {
-      this.focused = false
-    },
 
-    //---------------------- Event Select Payment Method ------------------------------\\
 
-    Selected_PaymentMethod(value) {
-      if (value == "credit card") {
-        setTimeout(() => {
-          this.loadStripe_payment();
-        }, 500);
-      }
-    },
+
+
 
     SetLocal(locale) {
       this.$i18n.locale = locale;
       this.$store.dispatch("language/setLanguage", locale);
       Fire.$emit("ChangeLanguage");
     },
-
     handleFullScreen() {
       Util.toggleFullScreen();
     },
     logoutUser() {
       this.logout();
     },
-
     // ------------------------ Paginate Products --------------------\\
     Product_paginatePerPage() {
       this.paginate_products(this.product_perPage, 0);
     },
-
     paginate_products(pageSize, pageNumber) {
       let itemsToParse = this.products;
       this.paginated_Products = itemsToParse.slice(
@@ -1373,18 +1561,14 @@ export default {
         (pageNumber + 1) * pageSize
       );
     },
-
     Product_onPageChanged(page) {
       this.paginate_products(this.product_perPage, page - 1);
       this.getProducts(page);
     },
-
     // ------------------------ Paginate Brands --------------------\\
-
     BrandpaginatePerPage() {
       this.paginate_Brands(this.brand_perPage, 0);
     },
-
     paginate_Brands(pageSize, pageNumber) {
       let itemsToParse = this.brands;
       this.paginated_Brands = itemsToParse.slice(
@@ -1392,17 +1576,13 @@ export default {
         (pageNumber + 1) * pageSize
       );
     },
-
     BrandonPageChanged(page) {
       this.paginate_Brands(this.brand_perPage, page - 1);
     },
-
     // ------------------------ Paginate Categories --------------------\\
-
     Category_paginatePerPage() {
       this.paginate_Category(this.category_perPage, 0);
     },
-
     paginate_Category(pageSize, pageNumber) {
       let itemsToParse = this.categories;
       this.paginated_Category = itemsToParse.slice(
@@ -1410,11 +1590,9 @@ export default {
         (pageNumber + 1) * pageSize
       );
     },
-
     Category_onPageChanged(page) {
       this.paginate_Category(this.category_perPage, page - 1);
     },
-
     //--- Submit Validate Create Sale
     Submit_Pos() {
       // Start the progress bar.
@@ -1464,7 +1642,6 @@ export default {
         }
       });
     },
-
     //------ Validate Form Submit_Payment
     Submit_Payment() {
       // Start the progress bar.
@@ -1504,7 +1681,6 @@ export default {
         }
       });
     },
-
     //------------- Submit Validation Create & Edit Customer
     Submit_Customer() {
       // Start the progress bar.
@@ -1523,7 +1699,6 @@ export default {
         }
       });
     },
-
     //---------------------------------------- Create new Customer -------------------------------\\
     Create_Client() {
       axios
@@ -1531,6 +1706,7 @@ export default {
           name: this.client.name,
           email: this.client.email,
           phone: this.client.phone,
+          tax_number: this.client.tax_number,
           country: this.client.country,
           city: this.client.city,
           adresse: this.client.adresse
@@ -1550,13 +1726,11 @@ export default {
           this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
         });
     },
-
     //------------------------------ New Model (create Customer) -------------------------------\\
     New_Client() {
       this.reset_Form_client();
       this.$bvModal.show("New_Customer");
     },
-
     //-------------------------------- reset Form -------------------------------\\
     reset_Form_client() {
       this.client = {
@@ -1564,24 +1738,22 @@ export default {
         name: "",
         email: "",
         phone: "",
+        tax_number: "",
         country: "",
         city: "",
         adresse: ""
       };
     },
-
     //------------------------------------ Get Clients Without Paginate -------------------------\\
     Get_Client_Without_Paginate() {
       axios
-        .get("Get_Clients_Without_Paginate")
+        .get("get_clients_without_paginate")
         .then(({ data }) => (this.clients = data));
     },
-
     //---Validate State Fields
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null;
     },
-
     //------ Toast
     makeToast(variant, msg, title) {
       this.$root.$bvToast.toast(msg, {
@@ -1590,7 +1762,6 @@ export default {
         solid: true
       });
     },
-
     //---------------------- Event Select Warehouse ------------------------------\\
     Selected_Warehouse(value) {
       this.search_input= '';
@@ -1599,30 +1770,31 @@ export default {
       this.getProducts(1);
     },
 
-    //------------------------------------ Get Products By Warehouse -------------------------\\
+    onClientSelected(selectedClient) {
+      this.client_name = '';
+      const client = this.clients.find(client => client.id === selectedClient);
+      this.client_name = client.name;
+    },
 
+    //------------------------------------ Get Products By Warehouse -------------------------\\
     Get_Products_By_Warehouse(id) {
       // Start the progress bar.
         NProgress.start();
         NProgress.set(0.1);
       axios
-        .get("Products/Warehouse/" + id + "?stock=" + 1)
+        .get("get_Products_by_warehouse/" + id + "?stock=" + 1 + "&is_sale=" + 1 + "&product_service=" + 1)
          .then(response => {
             this.products_pos = response.data;
              NProgress.done();
-
             })
           .catch(error => {
           });
     },
-
     //----------------------------------------- Add Detail of Sale -------------------------\\
     add_product(code) {
       this.audio.play();
       if (this.details.some(detail => detail.code === code)) {
         this.increment_qty_scanner(code);
-        // Complete the animation of theprogress bar.
-        NProgress.done();
       } else {
         if (this.details.length > 0) {
           this.order_detail_id();
@@ -1630,34 +1802,34 @@ export default {
           this.product.detail_id = 1;
         }
         this.details.push(this.product);
-
+        setTimeout(() => {
+          this.load_product = true;
+        }, 300);
         if(this.product.is_imei){
           this.Modal_Updat_Detail(this.product);
         }
       }
     },
-
     //-------------------------------- order detail id -------------------------\\
     order_detail_id() {
       this.product.detail_id = 0;
       var len = this.details.length;
       this.product.detail_id = this.details[len - 1].detail_id + 1;
     },
-
-    //---------------------- Get_sales_units ------------------------------\\
-    Get_sales_units(value) {
+    //---------------------- get_units ------------------------------\\
+    get_units(value) {
       axios
-        .get("Get_sales_units?id=" + value)
+        .get("get_units?id=" + value)
         .then(({ data }) => (this.units = data));
     },
-
     //------ Show Modal Update Detail Product
     Modal_Updat_Detail(detail) {
       this.detail = {};
-      this.Get_sales_units(detail.product_id);
+      this.get_units(detail.product_id);
       this.detail.detail_id = detail.detail_id;
       this.detail.sale_unit_id = detail.sale_unit_id;
       this.detail.name = detail.name;
+      this.detail.product_type = detail.product_type;
       this.detail.Unit_price = detail.Unit_price;
       this.detail.fix_price = detail.fix_price;
       this.detail.fix_stock = detail.fix_stock;
@@ -1669,15 +1841,13 @@ export default {
       this.detail.tax_percent = detail.tax_percent;
       this.detail.is_imei = detail.is_imei;
       this.detail.imei_number = detail.imei_number;
-
        setTimeout(() => {
         this.$bvModal.show("form_Update_Detail");
       }, 1000);
-
     },
 
-    //------ Submit Update Detail Product
 
+    //------ Submit Update Detail Product
     Update_Detail() {
       for (var i = 0; i < this.details.length; i++) {
         if (this.details[i].detail_id === this.detail.detail_id) {
@@ -1695,13 +1865,11 @@ export default {
               }
             }
           }
-
           if (this.details[i].current < this.details[i].quantity) {
             this.details[i].quantity = this.details[i].current;
           } else {
             this.details[i].quantity = 1;
           }
-
           this.details[i].Unit_price = this.detail.Unit_price;
           this.details[i].tax_percent = this.detail.tax_percent;
           this.details[i].tax_method = this.detail.tax_method;
@@ -1709,6 +1877,7 @@ export default {
           this.details[i].discount = this.detail.discount;
           this.details[i].sale_unit_id = this.detail.sale_unit_id;
           this.details[i].imei_number = this.detail.imei_number;
+          this.details[i].product_type = this.detail.product_type;
 
           if (this.details[i].discount_Method == "2") {
             //Fixed
@@ -1719,13 +1888,11 @@ export default {
               (this.details[i].Unit_price * this.details[i].discount) / 100
             );
           }
-
           if (this.details[i].tax_method == "1") {
             //Exclusive
             this.details[i].Net_price = parseFloat(
               this.details[i].Unit_price - this.details[i].DiscountNet
             );
-
             this.details[i].taxe = parseFloat(
               (this.details[i].tax_percent *
                 (this.details[i].Unit_price - this.details[i].DiscountNet)) /
@@ -1740,7 +1907,6 @@ export default {
               (this.details[i].Unit_price - this.details[i].DiscountNet) /
                 (this.details[i].tax_percent / 100 + 1)
             );
-
             this.details[i].taxe = parseFloat(
               this.details[i].Unit_price -
                 this.details[i].Net_price -
@@ -1750,18 +1916,14 @@ export default {
               this.details[i].Net_price + this.details[i].taxe
             );
           }
-
           this.$forceUpdate();
         }
       }
       this.CaclulTotal();
-
        setTimeout(() => {
         this.$bvModal.hide("form_Update_Detail");
       }, 1000);
-
     },
-
     //-- check Qty of  details order if Null or zero
     verifiedForm() {
       if (this.details.length <= 0) {
@@ -1776,22 +1938,24 @@ export default {
         for (var i = 0; i < this.details.length; i++) {
           if (
             this.details[i].quantity == "" ||
-            this.details[i].quantity === 0
+            this.details[i].quantity === 0 ||
+            this.details[i].quantity > this.details[i].current
           ) {
             count += 1;
+            if(this.details[i].quantity > this.details[i].current){
+              this.makeToast("warning", this.$t("LowStock"), this.$t("Warning"));
+              return false;
+            }
           }
         }
-
         if (count > 0) {
           this.makeToast("warning", this.$t("AddQuantity"), this.$t("Warning"));
-
           return false;
         } else {
           return true;
         }
       }
     },
-
     //------------------------------ Print -------------------------\\
     print_pos() {
       var divContents = document.getElementById("invoice-POS").innerHTML;
@@ -1803,16 +1967,19 @@ export default {
       a.document.write(divContents);
       a.document.write("</body></html>");
       a.document.close();
-      a.print();
-    },
 
+      setTimeout(() => {
+         a.print();
+      }, 1000);
+
+    },
     //-------------------------------- Invoice POS ------------------------------\\
     Invoice_POS(id) {
       // Start the progress bar.
       NProgress.start();
       NProgress.set(0.1);
       axios
-        .get("Sales/Print_Invoice/" + id)
+        .get("sales_print_invoice/" + id)
         .then(response => {
           this.invoice_pos = response.data;
           this.payments = response.data.payments;
@@ -1822,30 +1989,28 @@ export default {
             NProgress.done();
             this.$bvModal.show("Show_invoice");
           }, 500);
-          setTimeout(() => this.print_pos(), 1000);
+
+          if(response.data.pos_settings.is_printable){
+            setTimeout(() => this.print_pos(), 1000);
+          }
         })
         .catch(() => {
           // Complete the animation of the  progress bar.
           setTimeout(() => NProgress.done(), 500);
         });
     },
-
     //----------------------------------Process Payment ------------------------------\\
-
     async processPayment() {
       this.paymentProcessing = true;
-
       const { token, error } = await this.stripe.createToken(this.cardElement);
-
       if (error) {
         this.paymentProcessing = false;
         NProgress.done();
         this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
       } else {
-
         
         axios
-          .post("pos/CreatePOS", {
+          .post("pos/create_pos", {
             client_id: this.sale.client_id,
             warehouse_id: this.sale.warehouse_id,
             tax_rate: this.sale.tax_rate?this.sale.tax_rate:0,
@@ -1858,7 +2023,10 @@ export default {
             amount : parseFloat(this.payment.amount).toFixed(2),
             received_amount : parseFloat(this.payment.received_amount).toFixed(2),
             change: parseFloat(this.payment.received_amount - this.payment.amount).toFixed(2),
-            token: token.id
+            token: token.id,
+            is_new_credit_card: this.is_new_credit_card,
+            selectedCard: this.selectedCard,
+            card_id: this.card_id,
           })
           .then(response => {
             this.paymentProcessing = false;
@@ -1878,12 +2046,11 @@ export default {
           });
       }
     },
-
     //----------------------------------Create POS ------------------------------\\
     CreatePOS() {
       NProgress.start();
       NProgress.set(0.1);
-      if (this.payment.Reglement == "credit card") {
+      if (this.payment.Reglement == "credit card" && this.is_new_credit_card) {
         if (this.stripe_key != "") {
           this.processPayment();
         } else {
@@ -1897,19 +2064,23 @@ export default {
       } else {
         this.paymentProcessing = true;
         axios
-          .post("pos/CreatePOS", {
+          .post("pos/create_pos", {
             client_id: this.sale.client_id,
             warehouse_id: this.sale.warehouse_id,
             tax_rate: this.sale.tax_rate?this.sale.tax_rate:0,
             TaxNet: this.sale.TaxNet?this.sale.TaxNet:0,
             discount: this.sale.discount?this.sale.discount:0,
             shipping: this.sale.shipping?this.sale.shipping:0,
+            notes: this.sale.notes,
             details: this.details,
             GrandTotal: this.GrandTotal,
             payment: this.payment,
             amount : parseFloat(this.payment.amount).toFixed(2),
             received_amount : parseFloat(this.payment.received_amount).toFixed(2),
             change: parseFloat(this.payment.received_amount - this.payment.amount).toFixed(2),
+            is_new_credit_card: this.is_new_credit_card,
+            selectedCard: this.selectedCard,
+            card_id: this.card_id,
           })
           .then(response => {
             if (response.data.success === true) {
@@ -1929,7 +2100,6 @@ export default {
           });
       }
     },
-
     //------------------------------Formetted Numbers -------------------------\\
     formatNumber(number, dec) {
       const value = (typeof number === "string"
@@ -1943,36 +2113,35 @@ export default {
       while (formated.length < dec) formated += "0";
       return `${value[0]}.${formated}`;
     },
-
     //---------------------------------Get Product Details ------------------------\\
+    Get_Product_Details(product_id, variant_id) {
+       axios.get("/show_product_data/" + product_id +"/"+ variant_id).then(response => {
+        this.product.discount           = 0;
+        this.product.DiscountNet        = 0;
+        this.product.discount_Method    = "2";
+        this.product.product_id         = response.data.id;
+        this.product.product_type       = response.data.product_type;
+        this.product.name               = response.data.name;
+        this.product.Net_price          = response.data.Net_price;
+        this.product.Total_price        = response.data.Total_price;
+        this.product.Unit_price         = response.data.Unit_price;
+        this.product.taxe               = response.data.tax_price;
+        this.product.tax_method         = response.data.tax_method;
+        this.product.tax_percent        = response.data.tax_percent;
+        this.product.unitSale           = response.data.unitSale;
+        this.product.product_variant_id = variant_id;
+        this.product.code               = response.data.code;
+        this.product.fix_price          = response.data.fix_price;
+        this.product.sale_unit_id       = response.data.sale_unit_id;
+        this.product.is_imei            = response.data.is_imei;
+        this.product.imei_number        = '';
 
-    Get_Product_Details(product, product_id) {
-      axios.get("Products/" + product_id).then(response => {
-        this.product.discount = 0;
-        this.product.DiscountNet = 0;
-        this.product.discount_Method = "2";
-        this.product.product_id = response.data.id;
-        this.product.name = response.data.name;
-        this.product.Net_price = response.data.Net_price;
-        this.product.Total_price = response.data.Total_price;
-        this.product.Unit_price = response.data.Unit_price;
-        this.product.taxe = response.data.tax_price;
-        this.product.tax_method = response.data.tax_method;
-        this.product.tax_percent = response.data.tax_percent;
-        this.product.unitSale = response.data.unitSale;
-        this.product.product_variant_id = product.product_variant_id;
-        this.product.code = product.code;
-        this.product.fix_price = response.data.fix_price;
-        this.product.sale_unit_id = response.data.sale_unit_id;
-        this.product.is_imei = response.data.is_imei;
-        this.product.imei_number = '';
-        this.add_product(product.code);
+        this.add_product(response.data.code);
         this.CaclulTotal();
         // Complete the animation of theprogress bar.
         NProgress.done();
       });
     },
-
     //----------- Calcul Total
     CaclulTotal() {
       this.total = 0;
@@ -1981,7 +2150,6 @@ export default {
         this.details[i].subtotal = parseFloat(
           this.details[i].quantity * this.details[i].Net_price + tax
         );
-
         this.total = parseFloat(this.total + this.details[i].subtotal);
       }
       const total_without_discount = parseFloat(
@@ -1993,11 +2161,9 @@ export default {
       this.GrandTotal = parseFloat(
         total_without_discount + this.sale.TaxNet + this.sale.shipping
       );
-
       var grand_total =  this.GrandTotal.toFixed(2);
       this.GrandTotal = parseFloat(grand_total);
     },
-
     //-------Verified QTY
     Verified_Qty(detail, id) {
       for (var i = 0; i < this.details.length; i++) {
@@ -2016,7 +2182,6 @@ export default {
       this.$forceUpdate();
       this.CaclulTotal();
     },
-
     //----------------------------------- Increment QTY with barcode scanner ------------------------------\\
     increment_qty_scanner(code) {
       for (var i = 0; i < this.details.length; i++) {
@@ -2030,8 +2195,12 @@ export default {
       }
       this.CaclulTotal();
       this.$forceUpdate();
-    },
 
+      NProgress.done();
+      setTimeout(() => {
+        this.load_product = true;
+      }, 300);
+    },
     //----------------------------------- Increment QTY ------------------------------\\
     increment(id) {
       for (var i = 0; i < this.details.length; i++) {
@@ -2046,7 +2215,6 @@ export default {
       this.CaclulTotal();
       this.$forceUpdate();
     },
-
     //----------------------------------- decrement QTY ------------------------------\\
     decrement(detail, id) {
       for (var i = 0; i < this.details.length; i++) {
@@ -2061,7 +2229,6 @@ export default {
       this.CaclulTotal();
       this.$forceUpdate();
     },
-
   
     //---------- keyup OrderTax
     keyup_OrderTax() {
@@ -2074,9 +2241,7 @@ export default {
         this.CaclulTotal();
       }
     },
-
     //---------- keyup Discount
-
     keyup_Discount() {
       if (isNaN(this.sale.discount)) {
         this.sale.discount = 0;
@@ -2087,9 +2252,7 @@ export default {
         this.CaclulTotal();
       }
     },
-
     //---------- keyup Shipping
-
     keyup_Shipping() {
       if (isNaN(this.sale.shipping)) {
         this.sale.shipping = 0;
@@ -2100,9 +2263,7 @@ export default {
         this.CaclulTotal();
       }
     },
-
     //---------- keyup paid Amount
-
     Verified_paidAmount() {
       if (isNaN(this.payment.amount)) {
         this.payment.amount = 0;
@@ -2125,15 +2286,12 @@ export default {
         }
       }
     },
-
     //---------- keyup Received Amount
-
     Verified_Received_Amount() {
       if (isNaN(this.payment.received_amount)) {
         this.payment.received_amount = 0;
       } 
     },
-
     //-----------------------------------Delete Detail Product ------------------------------\\
     delete_Product_Detail(id) {
       for (var i = 0; i < this.details.length; i++) {
@@ -2143,7 +2301,6 @@ export default {
         }
       }
     },
-
     //----------Reset Pos
     Reset_Pos() {
       this.details = [];
@@ -2154,6 +2311,15 @@ export default {
         Reglement: "",
         notes: "",
       };
+
+      this.savedPaymentMethods= [],
+      this.hasSavedPaymentMethod= false,
+      this.useSavedPaymentMethod= false,
+      this.selectedCard=null,
+      this.card_id='',
+      this.is_new_credit_card= false,
+      this.submit_showing_credit_card= false,
+
       this.sale.tax_rate = 0;
       this.sale.TaxNet = 0;
       this.sale.shipping = 0;
@@ -2162,47 +2328,59 @@ export default {
       this.total = 0;
       this.category_id = "";
       this.brand_id = "";
+      this.client_name = "";
       this.getProducts(1);
     },
-
     //------------------------- get Result Value Search Product
-
     getResultValue(result) {
       return result.code + " " + "(" + result.name + ")";
     },
-
     //------------------------- Submit Search Product
-
     SearchProduct(result) {
-      this.product = {};
 
-      this.product.code = result.code;
-      this.product.current = result.qte_sale;
-      this.product.fix_stock = result.qte;
-      if (result.qte_sale < 1) {
-        this.product.quantity = result.qte_sale;
-      } else {
-        this.product.quantity = 1;
+      if(this.load_product){
+          this.load_product = false;
+          this.product = {};
+
+          if(result.product_type == 'is_service'){
+            this.product.quantity = 1;
+            this.product.code = result.code;
+
+          }else{
+
+            this.product.code = result.code;
+            this.product.current = result.qte_sale;
+            this.product.fix_stock = result.qte;
+            if (result.qte_sale < 1) {
+              this.product.quantity = result.qte_sale;
+            } else {
+              this.product.quantity = 1;
+            }
+          }
+          this.product.product_variant_id = result.product_variant_id;
+          this.Get_Product_Details(result.id, result.product_variant_id);
+
+          this.search_input= '';
+          this.$refs.product_autocomplete.value = "";
+          this.product_filter = [];
+
+      }else{
+        this.makeToast(
+          "warning",
+          this.$t("Please_wait_until_the_product_is_loaded"),
+          this.$t("Warning")
+        );
       }
-      this.product.product_variant_id = result.product_variant_id;
-      this.Get_Product_Details(result, result.id);
-
-      this.search_input= '';
-      this.$refs.product_autocomplete.value = "";
-      this.product_filter = [];
     },
 
 
       // Search Products
     search(){
-
       if (this.timer) {
             clearTimeout(this.timer);
             this.timer = null;
       }
-
-      if (this.search_input.length < 1) {
-
+      if (this.search_input.length < 2) {
         return this.product_filter= [];
       }
       if (this.sale.warehouse_id != "" &&  this.sale.warehouse_id != null) {
@@ -2227,58 +2405,67 @@ export default {
           this.$t("Warning")
         );
       }
-
     },
-
    
-
     //---------------------------------- Check if Product Exist in Order List ---------------------\\
-
     Check_Product_Exist(product, id) {
-      // this.audio.play();
-      // Start the progress bar.
-      NProgress.start();
-      NProgress.set(0.1);
-      this.product = {};
-      this.product.current = product.qte_sale;
-      this.product.fix_stock = product.qte;
-      if (product.qte_sale < 1) {
-        this.product.quantity = product.qte_sale;
-      } else {
-        this.product.quantity = 1;
-      }
-      this.Get_Product_Details(product, id);
-      NProgress.done();
 
-      this.search_input= '';
-      this.$refs.product_autocomplete.value = "";
-      this.product_filter = [];
+       if(this.load_product){
+          this.load_product = false;
+          NProgress.start();
+          NProgress.set(0.1);
+          this.product = {};
+
+          if( product.product_type == 'is_service'){
+            this.product.quantity = 1;
+
+          }else{
+
+            this.product.current = product.qte_sale;
+            this.product.fix_stock = product.qte;
+            if (product.qte_sale < 1) {
+              this.product.quantity = product.qte_sale;
+            } else {
+              this.product.quantity = 1;
+            }
+          }
+          this.Get_Product_Details(id, product.product_variant_id);
+          NProgress.done();
+          this.search_input= '';
+          this.$refs.product_autocomplete.value = "";
+          this.product_filter = [];
+
+        }else{
+            this.makeToast(
+              "warning",
+              this.$t("Please_wait_until_the_product_is_loaded"),
+              this.$t("Warning")
+            );
+        }
+
     },
+
 
     //--- Get Products by Category
     Products_by_Category(id) {
       this.category_id = id;
       this.getProducts(1);
     },
-
     //--- Get Products by Brand
     Products_by_Brands(id) {
       this.brand_id = id;
       this.getProducts(1);
     },
-
     //--- Get All Category
     getAllCategory() {
       this.category_id = "";
       this.getProducts(1);
     },
-
     //--- Get All Brands
     GetAllBrands() {
       this.brand_id = "";
       this.getProducts(1);
     },
-
     //------------------------------- Get Products with Filters ------------------------------\\
     getProducts(page = 1) {
       // Start the progress bar.
@@ -2286,7 +2473,7 @@ export default {
       NProgress.set(0.1);
       axios
         .get(
-          "GetProductsByParametre?page=" +
+          "pos/get_products_pos?page=" +
             page +
             "&category_id=" +
             this.category_id +
@@ -2294,14 +2481,13 @@ export default {
             this.brand_id +
             "&warehouse_id=" +
             this.sale.warehouse_id +
-            "&stock=" +
-            1
+            "&stock=" + 1 +
+            "&product_service=" + 1
         )
         .then(response => {
           this.products = response.data.products;
           this.product_totalRows = response.data.totalRows;
           this.Product_paginatePerPage();
-
           // Complete the animation of theprogress bar.
           NProgress.done();
         })
@@ -2310,19 +2496,18 @@ export default {
           NProgress.done();
         });
     },
-
     //---------------------------------------Get Elements ------------------------------\\
     GetElementsPos() {
       axios
-        .get("pos/GetELementPos")
+        .get("pos/data_create_pos")
         .then(response => {
           this.clients = response.data.clients;
           this.warehouses = response.data.warehouses;
           this.categories = response.data.categories;
           this.brands = response.data.brands;
-          // this.pos_settings = response.data.pos_settings;
           this.sale.warehouse_id = response.data.defaultWarehouse;
           this.sale.client_id = response.data.defaultClient;
+          this.client_name = response.data.default_client_name;
           this.getProducts();
           if (response.data.defaultWarehouse != "") {
             this.Get_Products_By_Warehouse(response.data.defaultWarehouse);
@@ -2337,16 +2522,13 @@ export default {
         });
     }
   },
-
   //-------------------- Created Function -----\\
-
   created() {
     this.GetElementsPos();
     Fire.$on("pay_now", () => {
       setTimeout(() => {
         this.payment.amount = this.formatNumber(this.GrandTotal, 2);
         this.payment.received_amount = this.formatNumber(this.GrandTotal, 2);
-
         this.payment.Reglement = "Cash";
         this.$bvModal.show("Add_Payment");
         // Complete the animation of theprogress bar.
@@ -2364,4 +2546,7 @@ export default {
   /* text-transform: uppercase; */
   /* height: 50px; */
 }
+  .bg-selected-card{
+        background-color: #dcdfe6;
+  }
 </style>

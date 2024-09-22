@@ -24,7 +24,7 @@
             <i class="i-Add"></i>
             <span>{{$t('CreateSale')}}</span>
           </router-link>
-          <button @click="Quote_Email()" class="btn-sm btn btn-info ripple btn-icon m-1">
+          <button @click="SendEmail()" class="btn-sm btn btn-info ripple btn-icon m-1">
             <i class="i-Envelope-2"></i>
             {{$t('Email')}}
           </button>
@@ -202,7 +202,7 @@ export default {
       let id = this.$route.params.id;
      
        axios
-        .get(`Quote_PDF/${id}`, {
+        .get(`quote_pdf/${id}`, {
           responseType: "blob", // important
           headers: {
             "Content-Type": "application/json"
@@ -265,20 +265,13 @@ export default {
       });
     },
 
-    //------------------------------------ Form Send Quotation in Email -------------------------\\
-    Quote_Email() {
-      this.email.to = this.quote.client_email;
-      this.email.Quote_Ref = this.quote.Ref;
-      this.email.client_name = this.quote.client_name;
-      this.SendEmail();
-    },
     SendEmail() {
       // Start the progress bar.
       NProgress.start();
       NProgress.set(0.1);
       let id = this.$route.params.id;
       axios
-        .post("quotations/sendQuote/email", {
+        .post("quotations_send_email", {
           id: id,
           to: this.email.to,
           client_name: this.email.client_name,
@@ -308,7 +301,7 @@ export default {
       NProgress.set(0.1);
       let id = this.$route.params.id;
       axios
-        .post("quotations/send/sms", {
+        .post("quotations_send_sms", {
           id: id,
         })
         .then(response => {

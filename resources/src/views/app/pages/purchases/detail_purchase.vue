@@ -7,7 +7,7 @@
       <b-row>
         <b-col md="12" class="mb-2">
           <router-link
-            v-if="currentUserPermissions && currentUserPermissions.includes('Purchases_edit')"
+            v-if="currentUserPermissions && currentUserPermissions.includes('Purchases_edit') && purchase.purchase_has_return == 'no'"
             title="Edit"
             class="btn btn-success btn-icon ripple btn-sm"
             :to="{ name:'edit_purchase', params: { id: $route.params.id } }"
@@ -15,7 +15,7 @@
             <i class="i-Edit"></i>
             <span>{{$t('EditPurchase')}}</span>
           </router-link>
-          <button @click="purchase_Email()" class="btn btn-info btn-icon ripple btn-sm">
+          <button @click="Send_Email()" class="btn btn-info btn-icon ripple btn-sm">
             <i class="i-Envelope-2"></i>
             {{$t('Email')}}
           </button>
@@ -31,7 +31,7 @@
             {{$t('print')}}
           </button>
           <button
-            v-if="currentUserPermissions && currentUserPermissions.includes('Purchases_delete')"
+            v-if="currentUserPermissions && currentUserPermissions.includes('Purchases_delete') && purchase.purchase_has_return == 'no'"
             @click="Delete_Purchase()"
             class="btn btn-danger btn-icon ripple btn-sm"
           >
@@ -222,7 +222,7 @@ export default {
       NProgress.set(0.1);
       let id = this.$route.params.id;
       axios
-        .get(`Purchase_PDF/${id}`, {
+        .get(`purchase_pdf/${id}`, {
           responseType: "blob", // important
           headers: {
             "Content-Type": "application/json"
@@ -286,12 +286,12 @@ export default {
     },
 
     //---------------------------------------------------- Purchase Email -------------------------------\\
-    purchase_Email(purchase) {
-      this.email.to = this.purchase.supplier_email;
-      this.email.Purchase_Ref = this.purchase.Ref;
-      this.email.supplier_name = this.purchase.supplier_name;
-      this.Send_Email();
-    },
+    // purchase_Email(purchase) {
+    //   this.email.to = this.purchase.supplier_email;
+    //   this.email.Purchase_Ref = this.purchase.Ref;
+    //   this.email.supplier_name = this.purchase.supplier_name;
+    //   this.Send_Email();
+    // },
 
     //--------------------------------------------- Send Purchase to Email -------------------------------\\
     Send_Email() {
@@ -300,11 +300,8 @@ export default {
       NProgress.set(0.1);
       let id = this.$route.params.id;
       axios
-        .post("purchases/send/email", {
+        .post("purchase_send_email", {
           id: id,
-          to: this.email.to,
-          supplier_name: this.email.supplier_name,
-          Ref: this.email.Purchase_Ref
         })
         .then(response => {
           // Complete the animation of the  progress bar.
@@ -330,7 +327,7 @@ export default {
       NProgress.set(0.1);
       let id = this.$route.params.id;
       axios
-        .post("purchases/send/sms", {
+        .post("purchase_send_sms", {
           id: id,
         })
         .then(response => {

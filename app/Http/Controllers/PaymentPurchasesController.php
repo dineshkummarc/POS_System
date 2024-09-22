@@ -1,22 +1,33 @@
 <?php
 namespace App\Http\Controllers;
+use Twilio\Rest\Client as Client_Twilio;
+use GuzzleHttp\Client as Client_guzzle;
+use App\Models\SMSMessage;
+use Infobip\Api\SendSmsApi;
+use Infobip\Configuration;
+use Infobip\Model\SmsAdvancedTextualRequest;
+use Infobip\Model\SmsDestination;
+use Infobip\Model\SmsTextualMessage;
+use Illuminate\Support\Str;
+use App\Models\EmailMessage;
+use App\Mail\CustomEmail;
+use App\utils\helpers;
 
-use App\Exports\Payment_Purchase_Export;
 use App\Mail\Payment_Purchase;
 use App\Models\PaymentPurchase;
 use App\Models\Provider;
 use App\Models\Purchase;
 use App\Models\Role;
 use App\Models\Setting;
-use App\utils\helpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
-use Maatwebsite\Excel\Facades\Excel;
-use Twilio\Rest\Client as Client_Twilio;
+use \Nwidart\Modules\Facades\Module;
+use App\Models\sms_gateway;
 use DB;
 use PDF;
+use ArPHP\I18N\Arabic;
 
 class PaymentPurchasesController extends BaseController
 {
@@ -95,8 +106,8 @@ class PaymentPurchasesController extends BaseController
             $item['Ref_Purchase'] = $Payment['purchase']->Ref;
             $item['provider_name'] = $Payment['purchase']['provider']->name;
             $item['Reglement'] = $Payment->Reglement;
-            $item['montant'] = number_format($Payment->montant, 2, '.', '');
-
+            $item['montant'] = $Payment->montant;
+            // $item['montant'] = number_format($Payment->montant, 2, '.', '');
             $data[] = $item;
         }
 
@@ -261,19 +272,6 @@ class PaymentPurchasesController extends BaseController
 
     }
 
-    //------------- Send Payment Purchase Return on Email -----------\\
-
-    public function SendEmail(Request $request)
-    {
-
-        $this->authorizeForUser($request->user('api'), 'view', PaymentPurchase::class);
-
-        $payment = $request->all();
-        $pdf = $this->Payment_purchase_pdf($request, $payment['id']);
-        $this->Set_config_mail(); // Set_config_mail => BaseController
-        $mail = Mail::to($request->to)->send(new Payment_Purchase($payment, $pdf));
-        return $mail;
-    }
 
     //----------- Reference order Payment Purchases --------------\\
 
@@ -312,48 +310,194 @@ class PaymentPurchasesController extends BaseController
         $settings = Setting::where('deleted_at', '=', null)->first();
         $symbol = $helpers->Get_Currency_Code();
 
-        $pdf = \PDF::loadView('pdf.payments_purchase', [
-            'symbol' => $symbol,
+        $Html = view('pdf.payments_purchase', [
+            'symbol'  => $symbol,
             'setting' => $settings,
             'payment' => $payment_data,
-        ]);
+        ])->render();
+
+        $arabic = new Arabic();
+        $p = $arabic->arIdentify($Html);
+
+        for ($i = count($p)-1; $i >= 0; $i-=2) {
+            $utf8ar = $arabic->utf8Glyphs(substr($Html, $p[$i-1], $p[$i] - $p[$i-1]));
+            $Html = substr_replace($Html, $utf8ar, $p[$i-1], $p[$i] - $p[$i-1]);
+        }
+
+        $pdf = PDF::loadHTML($Html);
 
         return $pdf->download('Payment_Purchase.pdf');
 
     }
 
-    //----------- Export To Excel Payment Purchases  --------------\\
 
-    public function exportExcel(Request $request)
+    //------------- Send Payment purchase on Email -----------\\
+
+    public function SendEmail(Request $request)
     {
         $this->authorizeForUser($request->user('api'), 'view', PaymentPurchase::class);
 
-        return Excel::download(new Payment_Purchase_Export, 'Payment_Purchase.xlsx');
+        //PaymentPurchase
+        $payment = PaymentPurchase::with('purchase.provider')->findOrFail($request->id);
+
+        $helpers = new helpers();
+        $currency = $helpers->Get_Currency();
+
+        //settings
+        $settings = Setting::where('deleted_at', '=', null)->first();
+    
+        //the custom msg of payment_received
+        $emailMessage  = EmailMessage::where('name', 'payment_sent')->first();
+
+        if($emailMessage){
+            $message_body = $emailMessage->body;
+            $message_subject = $emailMessage->subject;
+        }else{
+            $message_body = '';
+            $message_subject = '';
+        }
+
+    
+        $payment_number = $payment->Ref;
+
+        $total_amount =  $currency .' '.number_format($payment->montant, 2, '.', ',');
+        
+        $contact_name = $payment['purchase']['provider']->name;
+        $business_name = $settings->CompanyName;
+
+        //receiver email
+        $receiver_email = $payment['purchase']['provider']->email;
+
+        //replace the text with tags
+        $message_body = str_replace('{contact_name}', $contact_name, $message_body);
+        $message_body = str_replace('{business_name}', $business_name, $message_body);
+        $message_body = str_replace('{payment_number}', $payment_number, $message_body);
+        $message_body = str_replace('{total_amount}', $total_amount, $message_body);
+
+        $email['subject'] = $message_subject;
+        $email['body'] = $message_body;
+        $email['company_name'] = $business_name;
+
+        $this->Set_config_mail(); 
+
+        $mail = Mail::to($receiver_email)->send(new CustomEmail($email));
+
+        return $mail;
+    }
+     
+        
+    //-------------------Sms Notifications -----------------\\
+
+    public function Send_SMS(Request $request)
+    {
+        $this->authorizeForUser($request->user('api'), 'view', PaymentPurchase::class);
+
+        //PaymentPurchase
+        $payment = PaymentPurchase::with('purchase.provider')->findOrFail($request->id);
+
+        //settings
+        $settings = Setting::where('deleted_at', '=', null)->first();
+    
+        $default_sms_gateway = sms_gateway::where('id' , $settings->sms_gateway)
+         ->where('deleted_at', '=', null)->first();
+
+        $helpers = new helpers();
+        $currency = $helpers->Get_Currency();
+
+        //the custom msg of payment_sent
+        $smsMessage  = SMSMessage::where('name', 'payment_sent')->first();
+
+        if($smsMessage){
+            $message_text = $smsMessage->text;
+        }else{
+            $message_text = '';
+        }
+
+        $payment_number = $payment->Ref;
+
+        $total_amount =  $currency .' '.number_format($payment->montant, 2, '.', ',');
+        
+        $contact_name = $payment['purchase']['provider']->name;
+        $business_name = $settings->CompanyName;
+
+        //receiver phone
+        $receiverNumber = $payment['purchase']['provider']->phone;
+
+        //replace the text with tags
+        $message_text = str_replace('{contact_name}', $contact_name, $message_text);
+        $message_text = str_replace('{business_name}', $business_name, $message_text);
+        $message_text = str_replace('{payment_number}', $payment_number, $message_text);
+        $message_text = str_replace('{total_amount}', $total_amount, $message_text);
+
+        //twilio
+        if($default_sms_gateway->title == "twilio"){
+            try {
+    
+                $account_sid = env("TWILIO_SID");
+                $auth_token = env("TWILIO_TOKEN");
+                $twilio_number = env("TWILIO_FROM");
+    
+                $client = new Client_Twilio($account_sid, $auth_token);
+                $client->messages->create($receiverNumber, [
+                    'from' => $twilio_number, 
+                    'body' => $message_text]);
+        
+            } catch (Exception $e) {
+                return response()->json(['message' => $e->getMessage()], 500);
+            }
+        //nexmo
+        }elseif($default_sms_gateway->title == "nexmo"){
+            try {
+
+                $basic  = new \Nexmo\Client\Credentials\Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
+                $client = new \Nexmo\Client($basic);
+                $nexmo_from = env("NEXMO_FROM");
+        
+                $message = $client->message()->send([
+                    'to' => $receiverNumber,
+                    'from' => $nexmo_from,
+                    'text' => $message_text
+                ]);
+                        
+            } catch (Exception $e) {
+                return response()->json(['message' => $e->getMessage()], 500);
+            }
+
+        //---- infobip
+        }elseif($default_sms_gateway->title == "infobip"){
+
+            $BASE_URL = env("base_url");
+            $API_KEY = env("api_key");
+            $SENDER = env("sender_from");
+
+            $configuration = (new Configuration())
+                ->setHost($BASE_URL)
+                ->setApiKeyPrefix('Authorization', 'App')
+                ->setApiKey('Authorization', $API_KEY);
+            
+            $client = new Client_guzzle();
+            
+            $sendSmsApi = new SendSMSApi($client, $configuration);
+            $destination = (new SmsDestination())->setTo($receiverNumber);
+            $message = (new SmsTextualMessage())
+                ->setFrom($SENDER)
+                ->setText($message_text)
+                ->setDestinations([$destination]);
+                
+            $request = (new SmsAdvancedTextualRequest())->setMessages([$message]);
+            
+            try {
+                $smsResponse = $sendSmsApi->sendSmsMessage($request);
+                echo ("Response body: " . $smsResponse);
+            } catch (Throwable $apiException) {
+                echo("HTTP Code: " . $apiException->getCode() . "\n");
+            }
+            
+        }
+
+        return response()->json(['success' => true]);
     }
 
-     //-------------------Sms Notifications -----------------\\
-     public function Send_SMS(Request $request)
-     {
-         $payment = PaymentPurchase::with('purchase', 'purchase.provider')->findOrFail($request->id);
-
-         $url = url('/api/Payment_Purchase_PDF/' . $request->id);
-         $receiverNumber = $payment['purchase']['provider']->phone;
-         $message = "Dear" .' '.$payment['purchase']['provider']->name." \n We are contacting you in regard to a Payment #".$payment['purchase']->Ref.' '.$url.' '. "that has been created on your account. \n We look forward to conducting future business with you.";
-         try {
-   
-             $account_sid = env("TWILIO_SID");
-             $auth_token = env("TWILIO_TOKEN");
-             $twilio_number = env("TWILIO_FROM");
-   
-             $client = new Client_Twilio($account_sid, $auth_token);
-             $client->messages->create($receiverNumber, [
-                 'from' => $twilio_number, 
-                 'body' => $message]);
-     
-         } catch (Exception $e) {
-             return response()->json(['message' => $e->getMessage()], 500);
-         }
-     }
 
 
 }

@@ -4,24 +4,16 @@
 
     <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>
 
-     <b-row class="justify-content-center" v-if="!isLoading">
-      <b-col lg="3" md="6" sm="12">
-        <b-card class="card-icon-bg card-icon-bg-primary o-hidden mb-30 text-center">
-          <i class="i-Dollar-Sign"></i>
-          <div class="content">
-            <p class="text-muted mt-2 mb-0">{{$t('Total_Suppliers_Due')}}</p>
-            <p class="text-primary text-24 line-height-1 mb-2">{{currentUser.currency}} {{formatNumber((Total_due),2)}}</p>
-          </div>
-        </b-card>
-      </b-col>
-    </b-row>
-
     <b-card class="wrapper" v-if="!isLoading">
       <vue-good-table
         mode="remote"
         :columns="columns"
         :totalRows="totalRows"
-        :rows="providers"
+        :rows="rows"
+        :group-options="{
+          enabled: true,
+          headerPosition: 'bottom',
+        }"
         @on-page-change="onPageChange"
         @on-per-page-change="onPerPageChange"
         @on-sort-change="onSortChange"
@@ -78,7 +70,13 @@ export default {
       totalRows: "",
       providers: [],
       provider: {},
-      Total_due:0,
+       rows: [{
+          total_purchase: 'Total',
+         
+          children: [
+             
+          ],
+      },],
     };
   },
 
@@ -109,6 +107,7 @@ export default {
           label: this.$t("TotalAmount"),
           field: "total_amount",
           type: "decimal",
+          headerField: this.sumCount,
           tdClass: "text-left",
           thClass: "text-left",
           sortable: false
@@ -117,14 +116,25 @@ export default {
           label: this.$t("Paid"),
           field: "total_paid",
           type: "decimal",
+          headerField: this.sumCount2,
           tdClass: "text-left",
           thClass: "text-left",
           sortable: false
         },
         {
-          label: this.$t("Due"),
+          label: this.$t("Total_Purchase_Due"),
           field: "due",
           type: "decimal",
+          headerField: this.sumCount3,
+          tdClass: "text-left",
+          thClass: "text-left",
+          sortable: false
+        },
+        {
+          label: this.$t("Total_Purchase_Return_Due"),
+          field: "return_Due",
+          type: "decimal",
+          headerField: this.sumCount4,
           tdClass: "text-left",
           thClass: "text-left",
           sortable: false
@@ -142,6 +152,39 @@ export default {
   },
 
   methods: {
+
+    sumCount(rowObj) {
+     
+    	let sum = 0;
+      for (let i = 0; i < rowObj.children.length; i++) {
+        sum += rowObj.children[i].total_amount;
+      }
+      return sum;
+    },
+    sumCount2(rowObj) {
+     
+    	let sum = 0;
+      for (let i = 0; i < rowObj.children.length; i++) {
+        sum += rowObj.children[i].total_paid;
+      }
+      return sum;
+    },
+    sumCount3(rowObj) {
+     
+    	let sum = 0;
+      for (let i = 0; i < rowObj.children.length; i++) {
+        sum += rowObj.children[i].due;
+      }
+      return sum;
+    },
+    sumCount4(rowObj) {
+     
+    	let sum = 0;
+      for (let i = 0; i < rowObj.children.length; i++) {
+        sum += rowObj.children[i].return_Due;
+      }
+      return sum;
+    },
 
     //--------------------------- Download_PDF -------------------------------\\
     Download_PDF(provider , id) {
@@ -170,14 +213,6 @@ export default {
           // Complete the animation of the  progress bar.
           setTimeout(() => NProgress.done(), 500);
         });
-    },
-
-    Sum_Total_due() {
-    	let sum = 0;
-      for (let i = 0; i < this.providers.length; i++) {
-        sum += this.providers[i].due;
-      }
-      this.Total_due = sum;
     },
 
     //---- update Params Table
@@ -257,7 +292,7 @@ export default {
         .then(response => {
           this.providers = response.data.report;
           this.totalRows = response.data.totalRows;
-          this.Sum_Total_due();
+          this.rows[0].children = this.providers;
           // Complete the animation of theprogress bar.
           NProgress.done();
           this.isLoading = false;

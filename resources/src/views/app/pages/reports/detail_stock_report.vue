@@ -4,11 +4,11 @@
     <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>
 
     <b-row v-if="!isLoading">
-        <b-col lg="12">
+        <b-col lg="12" class="mb-4">
             <h3 class="text-center">{{product.name}}</h3>
         </b-col>
       <!-- Warehouse Quantity -->
-          <b-col md="5" class="mt-4">
+          <b-col md="5" v-if="product.type == 'is_single'">
           
             <table class="table table-hover table-sm">
               <thead>
@@ -76,6 +76,18 @@
                 <b-button @click="Sales_PDF()" size="sm" variant="outline-success ripple m-1">
                   <i class="i-File-Copy"></i> PDF
                 </b-button>
+
+                <vue-excel-xlsx
+                    class="btn btn-sm btn-outline-danger ripple m-1"
+                    :data="sales"
+                    :columns="columns_sales"
+                    :file-name="'sales_report'"
+                    :file-type="'xlsx'"
+                    :sheet-name="'sales_report'"
+                    >
+                    <i class="i-File-Excel"></i> EXCEL
+                </vue-excel-xlsx>
+
               </div>
                 <template slot="table-row" slot-scope="props">
                   <div v-if="props.column.field == 'Ref'">
@@ -85,6 +97,11 @@
                       <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>
                     </router-link>
                   </div>
+                 
+                  <div v-else-if="props.column.field == 'total'">
+                    <span>{{currentUser.currency}} {{props.row.total}}</span>
+                  </div>
+
                 </template>
               </vue-good-table>
             </b-tab>
@@ -115,6 +132,17 @@
                 <b-button @click="Quotation_PDF()" size="sm" variant="outline-success ripple m-1">
                   <i class="i-File-Copy"></i> PDF
                 </b-button>
+
+                <vue-excel-xlsx
+                    class="btn btn-sm btn-outline-danger ripple m-1"
+                    :data="quotations"
+                    :columns="columns_quotations"
+                    :file-name="'Quotation_report'"
+                    :file-type="'xlsx'"
+                    :sheet-name="'Quotation_report'"
+                    >
+                    <i class="i-File-Excel"></i> EXCEL
+                </vue-excel-xlsx>
               </div>
                 <template slot="table-row" slot-scope="props">
                   
@@ -125,6 +153,11 @@
                       <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>
                     </router-link>
                   </div>
+
+                  <div v-else-if="props.column.field == 'total'">
+                    <span>{{currentUser.currency}} {{props.row.total}}</span>
+                  </div>
+
                 </template>
               </vue-good-table>
             </b-tab>
@@ -155,6 +188,17 @@
                 <b-button @click="Purchase_PDF()" size="sm" variant="outline-success ripple m-1">
                   <i class="i-File-Copy"></i> PDF
                 </b-button>
+
+                <vue-excel-xlsx
+                    class="btn btn-sm btn-outline-danger ripple m-1"
+                    :data="purchases"
+                    :columns="columns_purchases"
+                    :file-name="'purchases_report'"
+                    :file-type="'xlsx'"
+                    :sheet-name="'purchases_report'"
+                    >
+                    <i class="i-File-Excel"></i> EXCEL
+                </vue-excel-xlsx>
               </div>
                 <template slot="table-row" slot-scope="props">
                    <div v-if="props.column.field == 'Ref'">
@@ -164,6 +208,11 @@
                       <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>
                     </router-link>
                   </div>
+
+                  <div v-else-if="props.column.field == 'total'">
+                    <span>{{currentUser.currency}} {{props.row.total}}</span>
+                  </div>
+
                 </template>
               </vue-good-table>
             </b-tab>
@@ -194,6 +243,17 @@
                 <b-button @click="Sale_Return_PDF()" size="sm" variant="outline-success ripple m-1">
                   <i class="i-File-Copy"></i> PDF
                 </b-button>
+
+                <vue-excel-xlsx
+                    class="btn btn-sm btn-outline-danger ripple m-1"
+                    :data="sales_return"
+                    :columns="columns_sales_return"
+                    :file-name="'sales_return_report'"
+                    :file-type="'xlsx'"
+                    :sheet-name="'sales_return_report'"
+                    >
+                    <i class="i-File-Excel"></i> EXCEL
+                </vue-excel-xlsx>
               </div>
                 <template slot="table-row" slot-scope="props">
                   
@@ -204,6 +264,10 @@
                       <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>
                     </router-link>
                   </div>
+
+                  <div v-else-if="props.column.field == 'total'">
+                    <span>{{currentUser.currency}} {{props.row.total}}</span>
+                  </div>
                 </template>
               </vue-good-table>
             </b-tab>
@@ -213,7 +277,7 @@
               <vue-good-table
                 mode="remote"
                 :columns="columns_purchase_return"
-                :totalRows="totalRows_purchase_return"
+                :totalRows="totalRows_purchases_return"
                 :rows="purchases_return"
                 @on-page-change="Page_Change_purchases_Return"
                 @on-per-page-change="onPerPage_Change_purchases_Return"
@@ -234,6 +298,17 @@
                 <b-button @click="Returns_Purchase_PDF()" size="sm" variant="outline-success ripple m-1">
                   <i class="i-File-Copy"></i> PDF
                 </b-button>
+
+                <vue-excel-xlsx
+                    class="btn btn-sm btn-outline-danger ripple m-1"
+                    :data="purchases_return"
+                    :columns="columns_purchase_return"
+                    :file-name="'purchases_return_report'"
+                    :file-type="'xlsx'"
+                    :sheet-name="'purchases_return_report'"
+                    >
+                    <i class="i-File-Excel"></i> EXCEL
+                </vue-excel-xlsx>
               </div>
                 <template slot="table-row" slot-scope="props">
                   
@@ -243,6 +318,10 @@
                     >
                       <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>
                     </router-link>
+                  </div>
+
+                  <div v-else-if="props.column.field == 'total'">
+                    <span>{{currentUser.currency}} {{props.row.total}}</span>
                   </div>
                 </template>
               </vue-good-table>
@@ -830,7 +909,7 @@ export default {
     showDetails() {
       let id = this.$route.params.id;
       axios
-        .get(`Products/Detail/${id}`)
+        .get(`get_product_detail/${id}`)
         .then(response => {
           this.product = response.data;
         })

@@ -538,6 +538,102 @@ class PermissionRoleSeeder extends Seeder
 				'permission_id' => 105,
 				'role_id'       => 1,
 			],
+			[
+				'id'            => 106,
+				'permission_id' => 106,
+				'role_id'       => 1,
+			],
+			[
+				'id'            => 107,
+				'permission_id' => 107,
+				'role_id'       => 1,
+			],
+			[
+				'id'            => 108,
+				'permission_id' => 108,
+				'role_id'       => 1,
+			],
+			[
+				'id'            => 109,
+				'permission_id' => 109,
+				'role_id'       => 1,
+			],
+			[
+				'id'            => 110,
+				'permission_id' => 110,
+				'role_id'       => 1,
+			],
+			[
+				'id'            => 111,
+				'permission_id' => 111,
+				'role_id'       => 1,
+			],
+			[
+				'id'            => 112,
+				'permission_id' => 112,
+				'role_id'       => 1,
+			],
+			[
+				'id'            => 113,
+				'permission_id' => 113,
+				'role_id'       => 1,
+			],
+			[
+				'id'            => 114,
+				'permission_id' => 114,
+				'role_id'       => 1,
+			],
+			[
+				'id'            => 115,
+				'permission_id' => 115,
+				'role_id'       => 1,
+			],
+			[
+				'id'            => 116,
+				'permission_id' => 116,
+				'role_id'       => 1,
+			],
+			[
+				'id'            => 117,
+				'permission_id' => 117,
+				'role_id'       => 1,
+			],
+			[
+				'id'            => 118,
+				'permission_id' => 118,
+				'role_id'       => 1,
+			],
+			[
+				'id'            => 119,
+				'permission_id' => 119,
+				'role_id'       => 1,
+			],
+			[
+				'id'            => 120,
+				'permission_id' => 120,
+				'role_id'       => 1,
+			],
+			[
+				'id'            => 121,
+				'permission_id' => 121,
+				'role_id'       => 1,
+			],
+			[
+				'id'            => 122,
+				'permission_id' => 122,
+				'role_id'       => 1,
+			],
+			[
+				'id'            => 123,
+				'permission_id' => 123,
+				'role_id'       => 1,
+			],
+			[
+				'id'            => 124,
+				'permission_id' => 124,
+				'role_id'       => 1,
+			],
+			
 		)
 	);
     }

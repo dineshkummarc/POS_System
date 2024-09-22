@@ -34,7 +34,8 @@
                            <div><strong>Total Purchases:</strong> {{$provider['total_purchase']}}</div>
                            <div><strong>Total Amount:</strong> {{$symbol}} {{$provider['total_amount']}}</div>
                            <div><strong>Total Paid:</strong> {{$symbol}} {{$provider['total_paid']}}</div>
-                           <div><strong>Due:</strong> {{$symbol}} {{$provider['due']}}</div>
+                           <div><strong>Total Purchases Due:</strong> {{$symbol}} {{$provider['due']}}</div>
+                           <div><strong>Total Purchase Return Due:</strong> {{$symbol}} {{$provider['return_Due']}}</div>
                         </td>
                      </tr>
                   </tbody>

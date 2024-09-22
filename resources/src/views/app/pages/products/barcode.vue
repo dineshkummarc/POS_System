@@ -123,7 +123,10 @@
               <div class="barcode-row" v-if="ShowCard" id="print_barcode_label">
                 <div :class="class_type_page" v-for ="(k, i) in total_a4" :key="i">
                   <div class="barcode-item" :class="class_sheet"  v-for="(sheet, index) in sheets" :key="index" >
+                    <div class="head_barcode text-left" style=" padding-left: 10px;font-weight: bold; ">
                       <span class="barcode-name">{{product.name}}</span>
+                      <span class="barcode-price">{{currentUser.currency}} {{product.Net_price}}</span>
+                    </div>
                     <barcode
                       class="barcode"
                       :format="product.Type_barcode"
@@ -138,7 +141,10 @@
                 </div>
                 <div :class="class_type_page"  v-if="rest > 0">
                   <div class="barcode-item" :class="class_sheet"  v-for="(sheet, index) in rest" :key="index" >
-                      <span  class="barcode-name">{{product.name}}</span>
+                    <div class="head_barcode text-left" style=" padding-left: 10px;font-weight: bold; ">
+                      <span class="barcode-name">{{product.name}}</span>
+                      <span class="barcode-price">{{currentUser.currency}} {{product.Net_price}}</span>
+                    </div>
                     <barcode
                       class="barcode"
                       fontSize= "15"
@@ -161,6 +167,8 @@
 <script>
 import VueBarcode from "vue-barcode";
 import NProgress from "nprogress";
+import { mapActions, mapGetters } from "vuex";
+
 export default {
   components: {
     barcode: VueBarcode
@@ -193,9 +201,15 @@ export default {
         code: "",
         Type_barcode: "",
         barcode:"",
+        Net_price:"",
       }
     };
   },
+
+  computed: {
+    ...mapGetters(["currentUser"])
+  },
+
   methods: {
     Per_Page(){
       this.total_a4 = parseInt(this.barcode.qte/this.sheets);
@@ -268,7 +282,7 @@ export default {
             clearTimeout(this.timer);
             this.timer = null;
       }
-      if (this.search_input.length < 1) {
+      if (this.search_input.length < 2) {
         return this.product_filter= [];
       }
       if (this.barcode.warehouse_id != "" &&  this.barcode.warehouse_id != null) {
@@ -308,6 +322,7 @@ export default {
         this.product.barcode = result.barcode;
         this.product.name = result.name;
         this.product.Type_barcode = result.Type_barcode;
+        this.product.Net_price = result.Net_price;
       }
       this.search_input= '';
       this.$refs.product_autocomplete.value = "";
@@ -327,7 +342,7 @@ export default {
         NProgress.start();
         NProgress.set(0.1);
       axios
-        .get("Products/Warehouse/" + id + "?stock=" + 0)
+        .get("get_Products_by_warehouse/" + id + "?stock=" + 0)
          .then(response => {
             this.products = response.data;
              NProgress.done();
@@ -369,7 +384,7 @@ export default {
     //----------------------------------- GET Barcode Elements -------------------------\\
     Get_Elements: function() {
       axios
-        .get("Products/Get_element/barcode")
+        .get("barcode_create_page")
         .then(response => {
           this.warehouses = response.data.warehouses;
           this.isLoading = false;
@@ -386,6 +401,7 @@ export default {
       this.products = [];
       this.product.name = "";
       this.product.code = "";
+      this.product.Net_price = "";
       this.barcode.qte = 10;
       this.count = 10;
       this.barcode.warehouse_id = "";

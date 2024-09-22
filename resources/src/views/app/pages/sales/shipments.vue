@@ -33,9 +33,16 @@
           <b-button @click="Shipments_pdf()" size="sm" variant="outline-success ripple m-1">
             <i class="i-File-Copy"></i> PDF
           </b-button>
-          <b-button @click="Shipments_Excel()" size="sm" variant="outline-danger ripple m-1">
-            <i class="i-File-Excel"></i> EXCEL
-          </b-button>
+           <vue-excel-xlsx
+              class="btn btn-sm btn-outline-danger ripple m-1"
+              :data="shipments"
+              :columns="columns"
+              :file-name="'shipments'"
+              :file-type="'xlsx'"
+              :sheet-name="'shipments'"
+              >
+              <i class="i-File-Excel"></i> EXCEL
+          </vue-excel-xlsx>
         </div>
 
         <template slot="table-row" slot-scope="props">
@@ -153,7 +160,7 @@
                 variant="primary"
                 type="submit"
                 :disabled="SubmitProcessing"
-              >{{$t('submit')}}</b-button>
+              ><i class="i-Yes me-2 font-weight-bold"></i> {{$t('submit')}}</b-button>
               <div v-once class="typo__p" v-if="SubmitProcessing">
                 <div class="spinner sm spinner-primary mt-3"></div>
               </div>
@@ -345,34 +352,6 @@ export default {
       pdf.autoTable(columns, self.shipments);
       pdf.text("Shipments", 40, 25);
       pdf.save("Shipments.pdf");
-    },
-
-    //--------------------------------- Shipments Excel -------------------------------\\
-    Shipments_Excel() {
-      // Start the progress bar.
-      NProgress.start();
-      NProgress.set(0.1);
-      axios
-        .get("shipments/export/Excel", {
-          responseType: "blob", // important
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
-        .then(response => {
-          const url = window.URL.createObjectURL(new Blob([response.data]));
-          const link = document.createElement("a");
-          link.href = url;
-          link.setAttribute("download", "Shipments.xlsx");
-          document.body.appendChild(link);
-          link.click();
-          // Complete the animation of theprogress bar.
-          setTimeout(() => NProgress.done(), 500);
-        })
-        .catch(() => {
-          // Complete the animation of theprogress bar.
-          setTimeout(() => NProgress.done(), 500);
-        });
     },
 
     //--------------------------------------- Get All Shipments -------------------------------\\

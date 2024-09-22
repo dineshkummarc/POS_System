@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\UserWarehouse;
-use App\Exports\ExpenseExport;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\Role;
@@ -13,7 +12,6 @@ use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Maatwebsite\Excel\Facades\Excel;
 
 class ExpensesController extends BaseController
 {
@@ -243,14 +241,6 @@ class ExpensesController extends BaseController
 
     }
 
-    //-------------- Export All Expenses to EXCEL  ---------------\\
-
-    public function exportExcel(Request $request)
-    {
-        $this->authorizeForUser($request->user('api'), 'view', Expense::class);
-
-        return Excel::download(new ExpenseExport, 'List_Expense.xlsx');
-    }
 
     //---------------- Show Form Create Expense ---------------\\
 

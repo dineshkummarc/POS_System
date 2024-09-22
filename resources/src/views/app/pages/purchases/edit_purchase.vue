@@ -118,7 +118,6 @@
                             <span>{{detail.code}}</span>
                             <br>
                             <span class="badge badge-success">{{detail.name}}</span>
-                            <i v-show="detail.no_unit !== 0" @click="Modal_Updat_Detail(detail)" class="i-Edit"></i>
                           </td>
                           <td>{{currentUser.currency}} {{formatNumber(detail.Net_cost, 3)}}</td>
                           <td>
@@ -154,14 +153,10 @@
                           <td>{{currentUser.currency}} {{formatNumber(detail.DiscountNet * detail.quantity, 2)}}</td>
                           <td>{{currentUser.currency}} {{formatNumber(detail.taxe * detail.quantity, 2)}}</td>
                           <td>{{currentUser.currency}} {{detail.subtotal.toFixed(2)}}</td>
-                          <td>
-                            <a v-show="detail.no_unit !== 0"
-                              @click="delete_Product_Detail(detail.detail_id)"
-                              class="btn btn-icon btn-sm"
-                              title="Delete"
-                            >
-                              <i class="i-Close-Window text-25 text-danger"></i>
-                            </a>
+                          <td v-show="detail.no_unit !== 0">
+                            <i v-if="currentUserPermissions && currentUserPermissions.includes('edit_product_purchase')"
+                              @click="Modal_Updat_Detail(detail)" class="i-Edit text-25 text-success"></i>
+                            <i @click="delete_Product_Detail(detail.detail_id)" class="i-Close-Window text-25 text-danger"></i>
                           </td>
                         </tr>
                       </tbody>
@@ -201,7 +196,7 @@
                 </div>
 
                  <!-- Order Tax  -->
-                <b-col lg="4" md="4" sm="12" class="mb-3">
+                <b-col lg="4" md="4" sm="12" class="mb-3" v-if="currentUserPermissions && currentUserPermissions.includes('edit_tax_discount_shipping_purchase')">
                   <validation-provider
                     name="Order Tax"
                     :rules="{ regex: /^\d*\.?\d*$/}"
@@ -225,7 +220,7 @@
                 </b-col>
 
                 <!-- Discount -->
-                <b-col lg="4" md="4" sm="12" class="mb-3">
+                <b-col lg="4" md="4" sm="12" class="mb-3" v-if="currentUserPermissions && currentUserPermissions.includes('edit_tax_discount_shipping_purchase')">
                   <validation-provider
                     name="Discount"
                     :rules="{ regex: /^\d*\.?\d*$/}"
@@ -249,7 +244,7 @@
                 </b-col>
 
                 <!-- Shipping  -->
-                <b-col lg="4" md="4" sm="12" class="mb-3">
+                <b-col lg="4" md="4" sm="12" class="mb-3" v-if="currentUserPermissions && currentUserPermissions.includes('edit_tax_discount_shipping_purchase')">
                   <validation-provider
                     name="Shipping"
                     :rules="{ regex: /^\d*\.?\d*$/}"
@@ -307,7 +302,7 @@
                 </b-col>
                 <b-col md="12">
                   <b-form-group>
-                    <b-button variant="primary" @click="Submit_Purchase" :disabled="SubmitProcessing">{{$t('submit')}}</b-button>
+                    <b-button variant="primary" @click="Submit_Purchase" :disabled="SubmitProcessing"><i class="i-Yes me-2 font-weight-bold"></i> {{$t('submit')}}</b-button>
                      <div v-once class="typo__p" v-if="SubmitProcessing">
                       <div class="spinner sm spinner-primary mt-3"></div>
                     </div>
@@ -439,7 +434,7 @@
 
             <b-col md="12">
                <b-form-group>
-                <b-button variant="primary" type="submit" :disabled="Submit_Processing_detail">{{$t('submit')}}</b-button>
+                <b-button variant="primary" type="submit" :disabled="Submit_Processing_detail"><i class="i-Yes me-2 font-weight-bold"></i> {{$t('submit')}}</b-button>
                 <div v-once class="typo__p" v-if="Submit_Processing_detail">
                   <div class="spinner sm spinner-primary mt-3"></div>
                 </div>
@@ -518,7 +513,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["currentUser"])
+    ...mapGetters(["currentUserPermissions","currentUser"])
   },
 
   methods: {
@@ -663,7 +658,7 @@ export default {
             this.timer = null;
       }
 
-      if (this.search_input.length < 1) {
+      if (this.search_input.length < 2) {
 
         return this.product_filter= [];
       }
@@ -713,7 +708,7 @@ export default {
         this.product.no_unit = 1;
         this.product.stock = result.qte_purchase;
         this.product.product_variant_id = result.product_variant_id;
-        this.Get_Product_Details(result.id);
+        this.Get_Product_Details(result.id, result.product_variant_id);
       }
 
       this.search_input= '';
@@ -735,7 +730,7 @@ export default {
         NProgress.start();
         NProgress.set(0.1);
       axios
-        .get("Products/Warehouse/" + id + "?stock=" + 0)
+        .get("get_Products_by_warehouse/" + id + "?stock=" + 0 + "&product_service=" + 0)
          .then(response => {
             this.products = response.data;
              NProgress.done();
@@ -967,8 +962,8 @@ export default {
 
     //---------------------------------get Product Details ------------------------\\
 
-    Get_Product_Details(product_id) {
-      axios.get("Products/" + product_id).then(response => {
+    Get_Product_Details(product_id, variant_id) {
+      axios.get("/show_product_data/" + product_id +"/"+ variant_id).then(response => {
         this.product.del = 0;
         this.product.id = 0;
         this.product.discount = 0;
